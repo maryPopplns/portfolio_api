@@ -33,9 +33,5 @@ exports.logger = winston.createLogger({
         alignColorsAndTime
       ),
     }),
-    new winston.transports.File({
-      filename: 'logger/app/error.log',
-      level: 'error',
-    }),
   ],
 });

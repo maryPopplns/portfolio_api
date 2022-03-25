@@ -9,6 +9,9 @@ const clientRouter = require(path.join(__dirname, './routes/client'));
 
 const app = express();
 
+// database connection
+require(path.join(__dirname, '/config/database'));
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

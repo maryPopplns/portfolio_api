@@ -1,11 +1,11 @@
-const createError = require('http-errors');
-const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const express = require('express');
+const createError = require('http-errors');
+const cookieParser = require('cookie-parser');
 
-const clientRouter = require(path.join(__dirname, './routes/client'));
 const usersRouter = require(path.join(__dirname, './routes/users'));
+const clientRouter = require(path.join(__dirname, './routes/client'));
 
 const app = express();
 

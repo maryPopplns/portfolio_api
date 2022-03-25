@@ -5,39 +5,29 @@ const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));
 
 require(path.join(__dirname, '../config/database'));
+const closeConnection = () => mongoose.connection.close();
 
-(function createUser() {
-  const user = new User({
+function createUser() {
+  User.create({
     username: 'spencer',
     password: '123',
-  });
-
-  const closeConnection = () => mongoose.connection.close();
-
-  user.save((error, result) => {
-    if (error) {
-      logger.error(error);
+  })
+    .then((result) => logger.info(result))
+    .catch((error) => logger.error(error))
+    .finally(() => {
       closeConnection();
-    } else {
-      logger.info(result);
-      closeConnection();
-    }
-  });
-})()(function createPost() {
-  const user = new User({
-    username: 'spencer',
-    password: '123',
-  });
+    });
+}
 
-  const closeConnection = () => mongoose.connection.close();
-
-  user.save((error, result) => {
-    if (error) {
-      logger.error(error);
+function createPost() {
+  Post.create({
+    title: 'title',
+    body: 'body',
+  })
+    .then((result) => logger.info(result))
+    .catch((error) => logger.error(error))
+    .finally(() => {
       closeConnection();
-    } else {
-      logger.info(result);
-      closeConnection();
-    }
-  });
-})();
+    });
+}
+createPost();

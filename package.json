@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "git": "git add . && git commit && git push origin $(git rev-parse --abbrev-ref HEAD) && echo '\n' && echo $(tput setaf 2)'committed: ' $(tput setaf 1)$(date) && echo '\n'"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

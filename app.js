@@ -1,7 +1,6 @@
 const path = require('path');
 const logger = require('morgan');
 const express = require('express');
-const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
 
 const usersRouter = require(path.join(__dirname, './routes/users'));
@@ -34,7 +33,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.end('error');
 });
 
 module.exports = app;

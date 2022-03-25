@@ -1,7 +1,8 @@
 require('dotenv').config();
+const path = require('path');
 const http = require('http');
 const app = require('../app');
-const debug = require('debug')('portfolio-api:server');
+const { logger } = require(path.join(__dirname, '../config/logger.js'));
 
 // Get port from environment and store in Express.
 const port = normalizePort(process.env.PORT || '3000');
@@ -59,5 +60,5 @@ function onError(error) {
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  logger.info('Listening on ' + bind);
 }

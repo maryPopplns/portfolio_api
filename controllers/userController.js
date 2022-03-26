@@ -14,7 +14,7 @@ exports.createUser = [
     User.find({ username: req.body.username })
       .then((result) => {
         const user = result[0];
-        user ? res.status(409).json() : next();
+        user ? res.status(409).end('user with same name exists') : next();
       })
       .catch((error) => next(error));
   },
@@ -40,7 +40,7 @@ exports.createUser = [
         username: req.body.username,
         password: hashedPassword,
       })
-        .then((result) => res.status(200).json())
+        .then((result) => res.status(200).end('user successfully created'))
         .catch((error) => next(error)));
   },
 ];

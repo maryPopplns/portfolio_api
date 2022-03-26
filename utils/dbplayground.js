@@ -1,4 +1,5 @@
 const path = require('path');
+const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 const User = require(path.join(__dirname, '../models/user'));
@@ -8,16 +9,29 @@ const Comment = require(path.join(__dirname, '../models/comment'));
 require(path.join(__dirname, '../config/database'));
 const closeConnection = () => mongoose.connection.close();
 
+const userName = 'spencer';
+const password = '123';
+
 function createUser() {
-  User.create({
-    username: 'spencer',
-    password: '123',
-  })
-    .then((result) => logger.info(result))
-    .catch((error) => logger.error(error))
-    .finally(() => {
-      closeConnection();
+  bcrypt.genSalt(10, function (error, salt) {
+    if (error) {
+      return logger.error('generating salt error: ', error);
+    }
+    bcrypt.hash(password, salt, function (error, hash) {
+      if (error) {
+        return logger.error('generating hash error: ', error);
+      }
+      User.create({
+        username: userName,
+        password: hash,
+      })
+        .then((result) => logger.info(result))
+        .catch((error) => logger.error(error))
+        .finally(() => {
+          closeConnection();
+        });
     });
+  });
 }
 
 function createPost() {
@@ -44,6 +58,6 @@ function createComment() {
     });
 }
 
-// createUser();
+createUser();
 // createPost();
-createComment();
+// createComment();

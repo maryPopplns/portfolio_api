@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { check } = require('express-validator');
+const res = require('express/lib/response');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
@@ -62,33 +63,28 @@ exports.loginUser = [
       { session: false },
       function (error, user, info) {
         // error || !user
-        if (error) {
-          next(error);
-        }
-        if (user) {
-          res.send('user');
-        }
-        if (!user) {
-          return res.status(400).json({
-            message: info.message,
-          });
-        }
+        error && next(error);
+        !user && res.status(400).json({ message: info.message });
+
         // user found
-        // req.login(user, { session: false }, (err) => {
-        //   if (err) {
-        //     res.send(err);
-        //   }
-        //   const token = jwt.sign(
-        //     {
-        //       data: user.toJSON(),
-        //       exp: process.env.ENV === 'dev' ? time.day : time.hour,
-        //     },
-        //     process.env.JWT_SECRET
-        //   );
-        //   // send token / redirect to home
-        //   res.json({ token });
-        // });
+        req.user = user;
+        next();
       }
     )(req, res, next);
+  },
+  function sendJWT(req, res, next) {
+    req.login(req.user, { session: false }, (error) => {
+      error && next(error);
+
+      const token = jwt.sign(
+        {
+          data: req.user.toJSON(),
+          exp: process.env.ENV === 'dev' ? time.day : time.hour,
+        },
+        process.env.JWT_SECRET
+      );
+      // send token/user
+      res.json({ user: req.user, token });
+    });
   },
 ];

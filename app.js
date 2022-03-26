@@ -8,7 +8,7 @@ const userRouter = require(path.join(__dirname, './routes/userRoute'));
 const app = express();
 
 // database connection
-require(path.join(__dirname, '/config/database'));
+require(path.join(__dirname, '/config/mongodb'));
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // passport config
-require(path.join(__dirname, '/config/database'));
+require(path.join(__dirname, '/config/passport'));
 
 // routes
 app.use('/user', userRouter);

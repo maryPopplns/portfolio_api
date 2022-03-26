@@ -6,7 +6,7 @@ const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));
 const Comment = require(path.join(__dirname, '../models/comment'));
 
-require(path.join(__dirname, '../config/database'));
+require(path.join(__dirname, '../config/mongodb'));
 const closeConnection = () => mongoose.connection.close();
 
 const username = 'michael';

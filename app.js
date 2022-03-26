@@ -2,7 +2,6 @@ const path = require('path');
 const logger = require('morgan');
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const { resolveAny } = require('dns');
 
 const userRouter = require(path.join(__dirname, './routes/userRoute'));
 

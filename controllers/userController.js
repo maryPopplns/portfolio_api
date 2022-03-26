@@ -1,8 +1,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 const { check } = require('express-validator');
-const res = require('express/lib/response');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));

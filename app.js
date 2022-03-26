@@ -2,9 +2,9 @@ const path = require('path');
 const logger = require('morgan');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const { resolveAny } = require('dns');
 
-const usersRouter = require(path.join(__dirname, './routes/users'));
-const clientRouter = require(path.join(__dirname, './routes/client'));
+const userRouter = require(path.join(__dirname, './routes/userRoute'));
 
 const app = express();
 
@@ -17,12 +17,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', clientRouter);
-app.use('/users', usersRouter);
-
-// 404
-app.use(function (req, res, next) {
-  // TODO create 404 page
+app.use('/user', userRouter);
+// remaining requests go to client
+app.use(function (req, res) {
+  res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
 // error handler

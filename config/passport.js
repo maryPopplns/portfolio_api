@@ -9,7 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 
 const User = require(path.join(__dirname, '../models/user'));
 
-// [ DEFINE LOCAL STRATEGY ]
+// local strategy
 passport.use(
   new LocalStrategy((username, password, done) => {
     User.findOne({ username }, (error, user) => {
@@ -30,6 +30,7 @@ passport.use(
   })
 );
 
+// jwt strategy
 passport.use(
   new JWTStrategy(
     {

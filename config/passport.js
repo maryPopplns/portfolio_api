@@ -12,21 +12,21 @@ const User = require(path.join(__dirname, '../models/user'));
 // local strategy
 passport.use(
   new LocalStrategy((username, password, done) => {
-    User.findOne({ username }, (error, user) => {
-      if (error) {
-        return done(error);
-      }
-      if (!user) {
-        return done(null, false, { message: 'incorrect username' });
-      }
-      bcrypt.compare(password, user.password, (error, res) => {
-        if (res) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: 'incorrect password' });
-        }
-      });
-    });
+    User.findOne({ username })
+      .then((user) => {
+        // no username matching
+        !user && done(null, false, { message: 'incorrect username' });
+
+        // compare hashed passwords
+        bcrypt
+          .compare(password, user.password)
+          .then((res) => {
+            res && done(null, user);
+            !res && done(null, false, { message: 'incorrect password' });
+          })
+          .catch((error) => done(error));
+      })
+      .catch((error) => done(error));
   })
 );
 

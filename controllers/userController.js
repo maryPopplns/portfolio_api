@@ -2,6 +2,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { check } = require('express-validator');
+const res = require('express/lib/response');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
@@ -19,28 +20,35 @@ exports.createUser = [
       .catch((error) => next(error));
   },
   async function createUser(req, res, next) {
-    // create salt
     let salt;
+    let hashedPassword;
+
+    // create salt
     await bcrypt
       .genSalt(10)
       .then((result) => (salt = result))
       .catch((error) => next(error));
 
     // hash password
-    let hashedPassword;
-    salt &&
-      (await bcrypt
-        .hash(req.body.password, salt)
-        .then((result) => (hashedPassword = result))
-        .catch((error) => next(error)));
+    await bcrypt
+      .hash(req.body.password, salt)
+      .then((result) => (hashedPassword = result))
+      .catch((error) => next(error));
 
     // create user
-    hashedPassword &&
-      (await User.create({
-        username: req.body.username,
-        password: hashedPassword,
-      })
-        .then((result) => res.status(200).end('user successfully created'))
-        .catch((error) => next(error)));
+    await User.create({
+      username: req.body.username,
+      password: hashedPassword,
+    })
+      .then(() => res.status(200).end('user successfully created'))
+      .catch((error) => next(error));
+  },
+];
+
+exports.loginUser = [
+  check('username').trim().escape(),
+  check('password').trim().escape(),
+  function loginUser(req, res, next) {
+    res.end('login');
   },
 ];

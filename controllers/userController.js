@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { check } = require('express-validator');
-const res = require('express/lib/response');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
@@ -43,7 +42,7 @@ exports.createUser = [
       username: req.body.username,
       password: hashedPassword,
     })
-      .then(() => res.status(200).end('user successfully created'))
+      .then(() => res.status(201).end('user successfully created'))
       .catch((error) => next(error));
   },
 ];
@@ -57,16 +56,16 @@ const time = {
 exports.loginUser = [
   check('username').trim().escape(),
   check('password').trim().escape(),
-  function loginUser(req, res, next) {
+  function checkForUser(req, res, next) {
     passport.authenticate(
       'local',
       { session: false },
       function (error, user, info) {
-        // error || !user
+        // error
         error && next(error);
-        !user && res.status(400).json({ message: info.message });
-
-        // user found
+        // !user
+        !user && res.status(401).json({ message: info.message });
+        // user found | attach user to req object
         req.user = user;
         next();
       }
@@ -74,8 +73,9 @@ exports.loginUser = [
   },
   function sendJWT(req, res, next) {
     req.login(req.user, { session: false }, (error) => {
+      // error
       error && next(error);
-
+      // create token
       const token = jwt.sign(
         {
           data: req.user.toJSON(),

@@ -31,7 +31,7 @@ async function createUser() {
       .then((result) => (hashedPassword = result))
       .catch((error) => {
         closeConnection();
-        logger.error(`error generating hash ${error}`);
+        logger.error(`error generating hash: ${error}`);
       }));
 
   // create user
@@ -46,27 +46,6 @@ async function createUser() {
         closeConnection();
       }));
 }
-// function createUser() {
-//   bcrypt.genSalt(10, function (error, salt) {
-//     if (error) {
-//       return logger.error('generating salt error: ', error);
-//     }
-//     bcrypt.hash(password, salt, function (error, hash) {
-//       if (error) {
-//         return logger.error('generating hash error: ', error);
-//       }
-//       User.create({
-//         username: username,
-//         password: hash,
-//       })
-//         .then((result) => logger.info(result))
-//         .catch((error) => logger.error(error))
-//         .finally(() => {
-//           closeConnection();
-//         });
-//     });
-//   });
-// }
 
 function createPost() {
   Post.create({

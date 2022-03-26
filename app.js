@@ -17,6 +17,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// passport config
+require(path.join(__dirname, '/config/database'));
+
+// routes
 app.use('/user', userRouter);
 // remaining requests go to client
 app.use(function (req, res) {
@@ -24,14 +28,8 @@ app.use(function (req, res) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.end('error');
+app.use(function (error, req, res, next) {
+  res.status(error.status || 500).json(`${error}`);
 });
 
 module.exports = app;

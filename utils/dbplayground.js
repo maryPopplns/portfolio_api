@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));
+const Comment = require(path.join(__dirname, '../models/comment'));
 
 require(path.join(__dirname, '../config/database'));
 const closeConnection = () => mongoose.connection.close();
@@ -30,4 +31,19 @@ function createPost() {
       closeConnection();
     });
 }
-createPost();
+
+function createComment() {
+  Comment.create({
+    comment: 'title',
+    user: '623e5757135c58fdafb6590a',
+  })
+    .then((result) => logger.info(result))
+    .catch((error) => logger.error(`${error}`))
+    .finally(() => {
+      closeConnection();
+    });
+}
+
+// createUser();
+// createPost();
+createComment();

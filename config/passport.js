@@ -43,11 +43,10 @@ passport.use(
       const id = jwtPayload.data._id;
       User.findById(id)
         .then((user) => {
-          if (!user) {
-            done(null, false, { message: 'no user' });
-          } else {
-            done(null, user);
-          }
+          // user found
+          user && done(null, user);
+          // no user found
+          !user && done(null, false, { message: 'no user' });
         })
         .catch((error) => done(error));
     }

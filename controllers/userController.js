@@ -42,7 +42,7 @@ exports.createUser = [
       username: req.body.username,
       password: hashedPassword,
     })
-      .then(() => res.status(201).end('user successfully created'))
+      .then(() => res.status(201).end('user created'))
       .catch((error) => next(error));
   },
 ];

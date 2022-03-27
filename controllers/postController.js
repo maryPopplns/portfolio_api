@@ -1,9 +1,9 @@
-const { check } = require('express-validator');
+require('dotenv').config();
 
 exports.createPost = [
-  check('username').trim().escape(),
-  check('password').trim().escape(),
-  function authentication(req, res) {
-    res.json({ user: req.user || 'none' });
+  function authentication(req, res, next) {
+    const isSuper = req.user.id === process.env.SUPER_USER_ID;
+    isSuper && next();
+    !isSuper && next({ status: 403, message: 'not super user' });
   },
 ];

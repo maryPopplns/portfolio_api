@@ -14,10 +14,9 @@ exports.createUser = [
     // check if user exists
     User.findOne({ username: req.body.username })
       .then((user) => {
-        // user found
-        user && res.status(409).json({ message: 'user with same name exists' });
-        // no user found
-        !user && next();
+        user
+          ? res.status(409).json({ message: 'user with same name exists' })
+          : next();
       })
       .catch((error) => next(error));
   },
@@ -64,11 +63,11 @@ exports.loginUser = [
       function (error, user, info) {
         // error
         error && next(error);
-        // !user
+        // no user
         !user && res.status(401).json({ message: info.message });
-        // user found | attach user to req object
+        // user found
         req.user = user;
-        next();
+        user && next();
       }
     )(req, res, next);
   },
@@ -76,6 +75,7 @@ exports.loginUser = [
     req.login(req.user, { session: false }, (error) => {
       // error
       error && next(error);
+
       // create token
       const token = jwt.sign(
         {

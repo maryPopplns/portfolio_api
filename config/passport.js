@@ -11,24 +11,27 @@ const User = require(path.join(__dirname, '../models/user'));
 
 // local strategy
 passport.use(
-  new LocalStrategy((username, password, done) => {
-    User.findOne({ username })
-      .then((user) => {
-        // no username matching
-        !user && done(null, false, { message: 'incorrect username' });
-
-        // compare hashed passwords
-        bcrypt
-          .compare(password, user.password)
-          .then((res) => {
-            // passwords match
-            res && done(null, user);
-            // passwords dont match
-            !res && done(null, false, { message: 'incorrect password' });
-          })
-          .catch((error) => done(error));
+  new LocalStrategy(async (username, password, done) => {
+    let user;
+    // query user
+    await User.findOne({ username })
+      .then((foundUser) => {
+        foundUser
+          ? (user = foundUser)
+          : done(null, false, { message: 'incorrect username' });
       })
       .catch((error) => done(error));
+
+    // compare input & stored passwords
+    user &&
+      (await bcrypt
+        .compare(password, user.password)
+        .then((passwordMatch) => {
+          passwordMatch
+            ? done(null, user)
+            : done(null, false, { message: 'incorrect password' });
+        })
+        .catch((error) => done(error)));
   })
 );
 
@@ -42,11 +45,10 @@ passport.use(
     function (jwtPayload, done) {
       const id = jwtPayload.data._id;
       User.findById(id)
-        .then((user) => {
-          // user found
-          user && done(null, user);
-          // no user found
-          !user && done(null, false, { message: 'no user' });
+        .then((foundUser) => {
+          foundUser
+            ? done(null, foundUser)
+            : done(null, false, { message: 'no user' });
         })
         .catch((error) => done(error));
     }

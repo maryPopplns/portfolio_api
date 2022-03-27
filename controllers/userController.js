@@ -48,8 +48,8 @@ exports.createUser = [
 ];
 
 const time = {
-  hour: Math.floor(Date.now() / 1000) + 60 * 60,
-  day: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+  hour: Math.floor(Date.now() / 1000) + 360,
+  ten: Math.floor(Date.now() / 1000) + 360 * 240,
 };
 
 // login user
@@ -79,7 +79,7 @@ exports.loginUser = [
       const token = jwt.sign(
         {
           data: req.user.toJSON(),
-          exp: process.env.ENV === 'dev' ? time.day : time.hour,
+          exp: process.env.ENV === 'dev' ? time.ten : time.hour,
         },
         process.env.JWT_SECRET
       );

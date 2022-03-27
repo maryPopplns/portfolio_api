@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 const userRouter = require(path.join(__dirname, './routes/userRoute'));
 const postRouter = require(path.join(__dirname, './routes/postRouter'));
+const auth = require(path.join(__dirname, './middleware/jwtAuth.js'));
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // passport config
 require(path.join(__dirname, '/config/passport'));
+// jwt auth
+app.use(auth);
 
 // routes
 app.use('/user', userRouter);

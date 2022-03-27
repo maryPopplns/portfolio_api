@@ -21,7 +21,9 @@ passport.use(
         bcrypt
           .compare(password, user.password)
           .then((res) => {
+            // passwords match
             res && done(null, user);
+            // passwords dont match
             !res && done(null, false, { message: 'incorrect password' });
           })
           .catch((error) => done(error));

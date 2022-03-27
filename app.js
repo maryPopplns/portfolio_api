@@ -4,6 +4,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 
 const userRouter = require(path.join(__dirname, './routes/userRoute'));
+const postRouter = require(path.join(__dirname, './routes/postRouter'));
 
 const app = express();
 
@@ -21,6 +22,7 @@ require(path.join(__dirname, '/config/passport'));
 
 // routes
 app.use('/user', userRouter);
+app.use('/post', postRouter);
 // remaining requests go to client
 app.use(function (req, res) {
   res.sendFile(path.join(__dirname, './public/index.html'));

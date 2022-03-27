@@ -1,4 +1,8 @@
 require('dotenv').config();
+const path = require('path');
+const { check } = require('express-validator');
+
+const Post = require(path.join(__dirname, '../models/post'));
 
 exports.createPost = [
   function isLoggedIn(req, res, next) {
@@ -10,7 +14,15 @@ exports.createPost = [
     isSuper && next();
     !isSuper && res.status(403).json({ message: 'forbidden' });
   },
-  function createPost(req, res, next) {
-    res.end('this is the end');
+  check('title').trim().escape(),
+  check('body').trim().escape(),
+  function savePost(req, res, next) {
+    // create/save post
+    Post.create({
+      title: req.body.title,
+      body: req.body.body,
+    })
+      .then(() => res.status(201).json({ message: 'post created' }))
+      .catch((error) => next(error));
   },
 ];

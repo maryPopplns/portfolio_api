@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { check } = require('express-validator');
-const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
 
@@ -13,10 +12,12 @@ exports.createUser = [
   check('password').trim().escape(),
   function checkForUser(req, res, next) {
     // check if user exists
-    User.find({ username: req.body.username })
-      .then((result) => {
-        const user = result[0];
-        user ? res.status(409).end('user with same name exists') : next();
+    User.findOne({ username: req.body.username })
+      .then((user) => {
+        // user found
+        user && res.status(409).json({ message: 'user with same name exists' });
+        // no user found
+        !user && next();
       })
       .catch((error) => next(error));
   },
@@ -42,7 +43,7 @@ exports.createUser = [
       username: req.body.username,
       password: hashedPassword,
     })
-      .then(() => res.status(201).end('user created'))
+      .then(() => res.status(201).json({ message: 'user created' }))
       .catch((error) => next(error));
   },
 ];

@@ -31,16 +31,27 @@ describe('user route', () => {
       User.create({
         username: 'spencer',
         password: '123',
-      })
-        .then(() => logger.info('setup user created'))
-        .catch((error) => logger.error('error creating setup user'));
+      }).catch((error) => logger.error('error creating setup user'));
       // create a user w/ same username
       request(app)
         .post('/user/create')
         .type('form')
         .send({ username: 'spencer', password: '123' })
         .expect('Content-Type', /json/)
-        .expect(409, done);
+        .expect(409);
+
+      // testing a second method
+      request(app)
+        .post('/user/create')
+        .type('form')
+        .send({ username: 'jack', password: '123' })
+        .then(() => {
+          request(app)
+            .post('/user/create')
+            .type('form')
+            .send({ username: 'jack', password: '123' })
+            .expect(409, done);
+        });
     });
   });
 });

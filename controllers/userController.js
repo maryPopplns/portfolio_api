@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { check } = require('express-validator');
+const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
 
@@ -12,11 +13,10 @@ exports.createUser = [
   check('password').trim().escape(),
   function checkForUser(req, res, next) {
     // check if user exists
-    User.findOne({ username: req.body.username })
-      .then((user) => {
-        user
-          ? res.status(409).json({ message: 'user with same name exists' })
-          : next();
+    User.find({ username: req.body.username })
+      .then((result) => {
+        const user = result[0];
+        user ? res.status(409).end('user with same name exists') : next();
       })
       .catch((error) => next(error));
   },
@@ -42,7 +42,7 @@ exports.createUser = [
       username: req.body.username,
       password: hashedPassword,
     })
-      .then(() => res.status(201).json({ message: 'user created' }))
+      .then(() => res.status(201).end('user created'))
       .catch((error) => next(error));
   },
 ];
@@ -63,11 +63,11 @@ exports.loginUser = [
       function (error, user, info) {
         // error
         error && next(error);
-        // no user
+        // !user
         !user && res.status(401).json({ message: info.message });
-        // user found
+        // user found | attach user to req object
         req.user = user;
-        user && next();
+        next();
       }
     )(req, res, next);
   },
@@ -75,7 +75,6 @@ exports.loginUser = [
     req.login(req.user, { session: false }, (error) => {
       // error
       error && next(error);
-
       // create token
       const token = jwt.sign(
         {

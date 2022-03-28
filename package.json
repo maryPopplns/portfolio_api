@@ -7,7 +7,7 @@
     "serverstart": "open http://localhost:5050 && nodemon ./bin/www",
     "playground": "node utils/dbplayground.js",
     "jwtsecret": "node utils/jwtSecret.js",
-    "test": "jest",
+    "test": "jest --watch --coverage",
     "git": "git add . && git commit && git push origin $(git rev-parse --abbrev-ref HEAD) && echo '\n' && echo $(tput setaf 2)'committed: ' $(tput setaf 1)$(date) && echo '\n'"
   },
   "dependencies": {

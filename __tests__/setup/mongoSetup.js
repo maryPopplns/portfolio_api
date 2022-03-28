@@ -1,3 +1,4 @@
+const path = require('path');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { logger } = require(path.join(__dirname, '../../config/logger.js'));
@@ -11,8 +12,8 @@ async function initializeMongoServer() {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     })
-    .then(() => logger.info(`DB connection successful 🔓`))
-    .catch((error) => logger.info(`${error}`));
+    .then(() => logger.info(`MEMORY-MONGO | DB connection successful 🔓`))
+    .catch((error) => logger.error(`MEMORY-MONGO | ${error}`));
 }
 
 module.exports = initializeMongoServer;

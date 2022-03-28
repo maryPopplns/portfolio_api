@@ -4,4 +4,4 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 
-module.exports = app;
+module.exports = { app, request };

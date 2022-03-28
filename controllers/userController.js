@@ -8,6 +8,8 @@ const { logger } = require(path.join(__dirname, '../config/logger'));
 
 const User = require(path.join(__dirname, '../models/user'));
 
+// TODO clean up comments on all pages.
+
 exports.createUser = [
   check('username').trim().escape(),
   check('password').trim().escape(),

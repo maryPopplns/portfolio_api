@@ -15,8 +15,8 @@ exports.createUser = [
     // check if user exists
     User.find({ username: req.body.username })
       .then((result) => {
-        const user = result[0];
-        user ? res.status(409).end('user with same name exists') : next();
+        const userFound = result[0];
+        userFound ? res.status(409).end('user with same name exists') : next();
       })
       .catch((error) => next(error));
   },

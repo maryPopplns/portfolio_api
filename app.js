@@ -3,8 +3,8 @@ const logger = require('morgan');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
-const userRouter = require(path.join(__dirname, './routes/userRoute'));
-const postRouter = require(path.join(__dirname, './routes/postRouter'));
+const userRoute = require(path.join(__dirname, './routes/userRoute'));
+const postRoute = require(path.join(__dirname, './routes/postRoute'));
 const auth = require(path.join(__dirname, './middleware/jwtAuth.js'));
 
 const app = express();
@@ -24,8 +24,8 @@ require(path.join(__dirname, '/config/passport'));
 app.use(auth);
 
 // routes
-app.use('/user', userRouter);
-app.use('/post', postRouter);
+app.use('/user', userRoute);
+app.use('/post', postRoute);
 // remaining requests go to client
 app.use(function (req, res) {
   res.sendFile(path.join(__dirname, './public/index.html'));

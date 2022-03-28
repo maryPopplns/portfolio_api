@@ -1,11 +1,8 @@
 const path = require('path');
 const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 
-const request = require('supertest');
-const express = require('express');
-const app = express();
+const app = require(path.join(__dirname, '../setup/appSetup'));
 
-app.use(express.urlencoded({ extended: false }));
 app.use('/user', userRoute);
 
 describe('user route', () => {

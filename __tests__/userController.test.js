@@ -40,7 +40,7 @@ describe('user route', () => {
         .expect('Content-Type', /json/)
         .expect(409);
 
-      // testing a second method
+      // testing a second method of creating user twice
       request(app)
         .post('/user/create')
         .type('form')

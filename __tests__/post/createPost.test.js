@@ -96,6 +96,6 @@ describe('create posts', () => {
       .set('Authorization', token2)
       .type('form')
       .send({ title, body })
-      .expect(201, done);
+      .expect(401, done);
   });
 });

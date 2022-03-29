@@ -10,6 +10,10 @@ const mongoDB = require(path.join(__dirname, '../setup/mongoSetup'));
 // passport setup
 require(path.join(__dirname, '../../config/passport'));
 
+// jwt auth
+const auth = require(path.join(__dirname, '../../middleware/jwtAuth.js'));
+app.use(auth);
+
 // user route
 const postRoute = require(path.join(__dirname, '../../routes/postRoute'));
 const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
@@ -23,11 +27,15 @@ describe('create posts', () => {
   // initialize DB
   mongoDB();
 
-  const username = 'spencer';
-  const password = '123';
+  const superToken =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjYyNDA4ZjRlMzNiMmJkMzg1ZjRhZTlkZSIsInVzZXJuYW1lIjoic3BlbmNlciIsInBhc3N3b3JkIjoiJDJhJDEwJFYyZVU0MVpBa2RPY294aFFKR2FZU3VKWWtSMFpsc3E0U2htanVOVTh6a3BtRmRXZFVMQURDIiwiY29tbWVudHMiOltdLCJsaWtlZFBvc3RzIjpbXSwiY29tbWVudExpa2VzIjpbXSwiX192IjowfSwiZXhwIjoxNjQ4NjYxOTE5LCJpYXQiOjE2NDg1NzU2Mzl9.5i3VqAb2zMjVilWkIg6n-mi3A_H29Lban9L6zmlTWy4';
+
+  // generated bearer token
   let token;
 
   async function createUser() {
+    const username = 'spencer';
+    const password = '123';
     let salt;
     let hashedPassword;
 
@@ -54,7 +62,7 @@ describe('create posts', () => {
       .type('form')
       .send({ username, password })
       .then((res) => {
-        token = res.body.token;
+        token = `Bearer ${res.body.token}`;
       });
   }
 
@@ -62,20 +70,18 @@ describe('create posts', () => {
   beforeEach(createUser);
 
   test('able to create posts', (done) => {
-    expect(1).toEqual(2);
-    done();
-    // const title = 'title of the post';
-    // const body = 'body of the post';
-    // request(app)
-    //   .post('/post/create')
-    //   .set('Authorization', token)
-    //   .type('form')
-    //   .send({ title, body })
-    //   .then((res) => {
-    //     const response = res.body;
-    //     console.log(response);
-    //     done();
-    //   })
-    //   .catch((error) => done(error));
+    const title = 'title of the post';
+    const body = 'body of the post';
+    request(app)
+      .post('/post/create')
+      .set('Authorization', token)
+      .type('form')
+      .send({ title, body })
+      .then((res) => {
+        const response = res.body;
+        console.log(response);
+        done();
+      })
+      .catch((error) => done(error));
   });
 });

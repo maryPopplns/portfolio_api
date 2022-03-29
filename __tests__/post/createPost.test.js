@@ -2,24 +2,18 @@ require('dotenv').config();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { logger } = require(path.join(__dirname, '../../config/logger'));
-
-// app setup
+// setups
 const { app, request } = require(path.join(__dirname, '../setup/appSetup'));
-// memory mongoDB setup | returns server function
 const mongoDB = require(path.join(__dirname, '../setup/mongoSetup'));
-// passport setup
 require(path.join(__dirname, '../../config/passport'));
-
 // jwt auth
 const auth = require(path.join(__dirname, '../../middleware/jwtAuth.js'));
 app.use(auth);
-
-// user route
+// routes
 const postRoute = require(path.join(__dirname, '../../routes/postRoute'));
 const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 app.use('/post', postRoute);
 app.use('/user', userRoute);
-
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
 
@@ -31,9 +25,11 @@ describe('create posts', () => {
   let token;
 
   async function createUser() {
+    // super user
     const username = 'spencer';
     const password = '123';
     const superUser = true;
+
     let salt;
     let hashedPassword;
 
@@ -49,13 +45,14 @@ describe('create posts', () => {
       .then((result) => (hashedPassword = result))
       .catch((error) => logger.error(`${error}`));
 
-    // create/save user
+    // create/save user1
     await User.create({
       username,
       password: hashedPassword,
       superUser,
     }).catch((error) => logger.error(`${error}`));
 
+    // get user1's bearer token
     await request(app)
       .post('/user/login')
       .type('form')

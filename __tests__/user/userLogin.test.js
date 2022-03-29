@@ -74,4 +74,22 @@ describe('login user', () => {
       })
       .catch((error) => done(error));
   });
+  test('incorrect password produces error', (done) => {
+    // log user in with same username/password
+    request(app)
+      .post('/user/login')
+      .type('form')
+      .send({ username: 'spencer', password: '1234' })
+      .expect('Content-Type', /json/)
+      .then((res) => {
+        const passwordErrorMessage = {
+          message: 'incorrect password',
+        };
+        const response = res.body;
+
+        expect(response).toEqual(passwordErrorMessage);
+        done();
+      })
+      .catch((error) => done(error));
+  });
 });

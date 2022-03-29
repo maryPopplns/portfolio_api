@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
+  superUser: { type: Boolean, required: true, default: false },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   likedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   commentLikes: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],

@@ -15,10 +15,11 @@ exports.createUser = [
   check('password').trim().escape(),
   function checkForUser(req, res, next) {
     // check if user exists
-    User.find({ username: req.body.username })
-      .then((result) => {
-        const userFound = result[0];
-        userFound ? res.status(409).end('user with same name exists') : next();
+    User.findOne({ username: req.body.username })
+      .then((userFound) => {
+        userFound
+          ? res.status(409).json({ message: 'same name exists' })
+          : next();
       })
       .catch((error) => next(error));
   },
@@ -44,7 +45,7 @@ exports.createUser = [
       username: req.body.username,
       password: hashedPassword,
     })
-      .then(() => res.status(201).end('user created'))
+      .then(() => res.status(201).json({ message: 'user created' }))
       .catch((error) => next(error));
   },
 ];
@@ -59,6 +60,7 @@ exports.loginUser = [
   check('username').trim().escape(),
   check('password').trim().escape(),
   function checkForUser(req, res, next) {
+    console.log('here');
     passport.authenticate(
       'local',
       { session: false },
@@ -69,7 +71,7 @@ exports.loginUser = [
         !user && res.status(401).json({ message: info.message });
         // user found | attach user to req object
         req.user = user;
-        next();
+        user && next();
       }
     )(req, res, next);
   },

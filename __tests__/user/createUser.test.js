@@ -20,7 +20,7 @@ describe('create user', () => {
       .post('/user/create')
       .type('form')
       .send({ username: 'michael', password: '123' })
-      // .expect('Content-Type', /json/)
+      .expect('Content-Type', /json/)
       .expect(201, done);
   });
   test('all users have unique usernames', (done) => {
@@ -34,7 +34,7 @@ describe('create user', () => {
       .post('/user/create')
       .type('form')
       .send({ username: 'spencer', password: '123' })
-      // .expect('Content-Type', /json/)
+      .expect('Content-Type', /json/)
       .expect(409);
 
     // testing a second method of creating user twice

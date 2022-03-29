@@ -44,6 +44,7 @@ describe('login user', () => {
       password: hashedPassword,
     }).catch((error) => logger.error(`${error}`));
   }
+
   // create user before each test
   beforeEach(createUser);
 
@@ -53,7 +54,6 @@ describe('login user', () => {
       .post('/user/login')
       .type('form')
       .send({ username: 'spencer', password: '123' })
-      .expect('Content-Type', /json/)
       .expect(200, done);
   });
   test('incorrect username produces error', (done) => {
@@ -62,7 +62,6 @@ describe('login user', () => {
       .post('/user/login')
       .type('form')
       .send({ username: 'spencer1', password: '123' })
-      .expect('Content-Type', /json/)
       .then((res) => {
         const usernameErrorMessage = {
           message: 'incorrect username',

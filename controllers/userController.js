@@ -60,7 +60,6 @@ exports.loginUser = [
   check('username').trim().escape(),
   check('password').trim().escape(),
   function checkForUser(req, res, next) {
-    console.log('here');
     passport.authenticate(
       'local',
       { session: false },

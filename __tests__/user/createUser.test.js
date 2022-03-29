@@ -14,7 +14,9 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 
 describe('create user', () => {
+  // initialize DB
   mongoDB();
+
   test('able to create users', (done) => {
     request(app)
       .post('/user/create')

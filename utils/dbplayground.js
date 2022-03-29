@@ -10,7 +10,8 @@ require(path.join(__dirname, '../config/mongodb'));
 const closeConnection = () => mongoose.connection.close();
 
 const username = 'michael';
-const password = '1234';
+const password = '123';
+const superUser = false;
 
 async function createUser() {
   // generate salt
@@ -39,6 +40,7 @@ async function createUser() {
     (await User.create({
       username: username,
       password: hashedPassword,
+      superUser,
     })
       .then((result) => logger.info(result))
       .catch((error) => logger.error(`error saving user: ${error}`))

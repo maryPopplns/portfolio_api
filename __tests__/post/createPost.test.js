@@ -27,15 +27,13 @@ describe('create posts', () => {
   // initialize DB
   mongoDB();
 
-  const superToken =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjYyNDA4ZjRlMzNiMmJkMzg1ZjRhZTlkZSIsInVzZXJuYW1lIjoic3BlbmNlciIsInBhc3N3b3JkIjoiJDJhJDEwJFYyZVU0MVpBa2RPY294aFFKR2FZU3VKWWtSMFpsc3E0U2htanVOVTh6a3BtRmRXZFVMQURDIiwiY29tbWVudHMiOltdLCJsaWtlZFBvc3RzIjpbXSwiY29tbWVudExpa2VzIjpbXSwiX192IjowfSwiZXhwIjoxNjQ4NjYxOTE5LCJpYXQiOjE2NDg1NzU2Mzl9.5i3VqAb2zMjVilWkIg6n-mi3A_H29Lban9L6zmlTWy4';
-
   // generated bearer token
   let token;
 
   async function createUser() {
     const username = 'spencer';
     const password = '123';
+    const superUser = true;
     let salt;
     let hashedPassword;
 
@@ -53,8 +51,9 @@ describe('create posts', () => {
 
     // create/save user
     await User.create({
-      username: username,
+      username,
       password: hashedPassword,
+      superUser,
     }).catch((error) => logger.error(`${error}`));
 
     await request(app)
@@ -77,11 +76,6 @@ describe('create posts', () => {
       .set('Authorization', token)
       .type('form')
       .send({ title, body })
-      .then((res) => {
-        const response = res.body;
-        console.log(response);
-        done();
-      })
-      .catch((error) => done(error));
+      .expect(201, done);
   });
 });

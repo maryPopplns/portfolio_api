@@ -21,12 +21,14 @@ describe('create posts', () => {
   // initialize DB
   mongoDB();
 
-  // generated bearer token
+  // generated bearer tokens
   let token;
+  let token2;
 
   async function createUser() {
     // super user
     const username = 'spencer';
+    const username2 = 'michael';
     const password = '123';
     const superUser = true;
 
@@ -45,20 +47,31 @@ describe('create posts', () => {
       .then((result) => (hashedPassword = result))
       .catch((error) => logger.error(`${error}`));
 
-    // create/save user1
+    // create/save user
     await User.create({
       username,
       password: hashedPassword,
       superUser,
     }).catch((error) => logger.error(`${error}`));
+    await User.create({
+      username: username2,
+      password: hashedPassword,
+    }).catch((error) => logger.error(`${error}`));
 
-    // get user1's bearer token
+    // get user's bearer token
     await request(app)
       .post('/user/login')
       .type('form')
       .send({ username, password })
       .then((res) => {
         token = `Bearer ${res.body.token}`;
+      });
+    await request(app)
+      .post('/user/login')
+      .type('form')
+      .send({ username2, password })
+      .then((res) => {
+        token2 = `Bearer ${res.body.token}`;
       });
   }
 
@@ -71,6 +84,16 @@ describe('create posts', () => {
     request(app)
       .post('/post/create')
       .set('Authorization', token)
+      .type('form')
+      .send({ title, body })
+      .expect(201, done);
+  });
+  test('user needs to be authorized', (done) => {
+    const title = 'title of the post';
+    const body = 'body of the post';
+    request(app)
+      .post('/post/create')
+      .set('Authorization', token2)
       .type('form')
       .send({ title, body })
       .expect(201, done);

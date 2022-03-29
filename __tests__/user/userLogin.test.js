@@ -56,4 +56,22 @@ describe('login user', () => {
       .expect('Content-Type', /json/)
       .expect(200, done);
   });
+  test('incorrect username produces error', (done) => {
+    // log user in with same username/password
+    request(app)
+      .post('/user/login')
+      .type('form')
+      .send({ username: 'spencer1', password: '123' })
+      .expect('Content-Type', /json/)
+      .then((res) => {
+        const usernameErrorMessage = {
+          message: 'incorrect username',
+        };
+        const response = res.body;
+
+        expect(response).toEqual(usernameErrorMessage);
+        done();
+      })
+      .catch((error) => done(error));
+  });
 });

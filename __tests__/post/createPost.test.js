@@ -81,9 +81,18 @@ describe('create posts', () => {
       .send({ title, body })
       .expect(201, done);
   });
-  test('user needs to be super user', (done) => {
-    const title = 'title of the post of michael';
-    const body = 'body of the post of michael';
+  test('user needs to be authorized', (done) => {
+    const title = 'title not authorized';
+    const body = 'body not authorized';
+    request(app)
+      .post('/post/create')
+      .type('form')
+      .send({ title, body })
+      .expect(401, done);
+  });
+  test('user needs to be superUser', (done) => {
+    const title = 'title needs to be superUser';
+    const body = 'body needs to be superUser';
     // when I attempt to create bearer token in createUser function, I am getting undefined.
     request(app)
       .post('/user/login')
@@ -98,14 +107,4 @@ describe('create posts', () => {
           .expect(403, done);
       });
   });
-  // test('user needs to be authorized', (done) => {
-  //   const title = 'title of the post';
-  //   const body = 'body of the post';
-  //   request(app)
-  //     .post('/post/create')
-  //     .set('Authorization', token2)
-  //     .type('form')
-  //     .send({ title, body })
-  //     .expect(401, done);
-  // });
 });

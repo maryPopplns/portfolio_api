@@ -23,10 +23,7 @@ describe('create posts', () => {
 
   // generated bearer tokens
   let token;
-  let token2;
-
   async function createUser() {
-    // super user
     const username = 'spencer';
     const username2 = 'michael';
     const password = '123';
@@ -56,7 +53,9 @@ describe('create posts', () => {
     await User.create({
       username: username2,
       password: hashedPassword,
-    }).catch((error) => logger.error(`${error}`));
+    })
+      // .then((result) => logger.debug(`create user result: \n ${result} \n`))
+      .catch((error) => logger.error(`${error}`));
 
     // get user's bearer token
     await request(app)
@@ -66,17 +65,11 @@ describe('create posts', () => {
       .then((res) => {
         token = `Bearer ${res.body.token}`;
       });
-    await request(app)
-      .post('/user/login')
-      .type('form')
-      .send({ username2, password })
-      .then((res) => {
-        token2 = `Bearer ${res.body.token}`;
-      });
   }
 
-  // create user before each test
   beforeEach(createUser);
+
+  // create user before each test
 
   test('able to create posts', (done) => {
     const title = 'title of the post';
@@ -88,14 +81,31 @@ describe('create posts', () => {
       .send({ title, body })
       .expect(201, done);
   });
-  test('user needs to be authorized', (done) => {
-    const title = 'title of the post';
-    const body = 'body of the post';
+  test('user needs to be super user', (done) => {
+    const title = 'title of the post of michael';
+    const body = 'body of the post of michael';
+    // when I attempt to create bearer token in createUser function, I am getting undefined.
     request(app)
-      .post('/post/create')
-      .set('Authorization', token2)
+      .post('/user/login')
       .type('form')
-      .send({ title, body })
-      .expect(401, done);
+      .send({ username: 'michael', password: '123' })
+      .then((res) => {
+        request(app)
+          .post('/post/create')
+          .set('Authorization', `Bearer ${res.body.token}`)
+          .type('form')
+          .send({ title, body })
+          .expect(403, done);
+      });
   });
+  // test('user needs to be authorized', (done) => {
+  //   const title = 'title of the post';
+  //   const body = 'body of the post';
+  //   request(app)
+  //     .post('/post/create')
+  //     .set('Authorization', token2)
+  //     .type('form')
+  //     .send({ title, body })
+  //     .expect(401, done);
+  // });
 });

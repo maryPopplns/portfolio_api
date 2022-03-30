@@ -10,8 +10,13 @@ const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
+// login controller
+const { loginUser } = require(path.join(
+  __dirname,
+  '../../controllers/userController'
+));
 
-describe('login user', () => {
+describe('POST user/login', () => {
   // initialize DB
   mongoDB();
 

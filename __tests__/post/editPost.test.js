@@ -20,7 +20,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('edit posts', () => {
+describe('PUT edit/:id', () => {
   // initialize DB
   mongoDB();
 

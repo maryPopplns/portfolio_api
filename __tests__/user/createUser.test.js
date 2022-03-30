@@ -9,7 +9,7 @@ app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
 
-describe('create user', () => {
+describe('POST user/create', () => {
   // initialize DB
   mongoDB();
 

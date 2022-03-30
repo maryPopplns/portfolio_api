@@ -55,7 +55,7 @@ describe('create posts', () => {
 
   // create user before each test
 
-  test('able to create posts', (done) => {
+  test('POST post/create', (done) => {
     async.waterfall([
       function getToken(next) {
         request(app)

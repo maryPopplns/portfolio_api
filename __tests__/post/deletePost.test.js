@@ -20,7 +20,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('edit posts', () => {
+describe('delete posts', () => {
   // initialize DB
   mongoDB();
 
@@ -66,7 +66,7 @@ describe('edit posts', () => {
 
   // create user before each test
 
-  test('able to edit posts', (done) => {
+  test('able to delete posts', (done) => {
     async.waterfall([
       function getToken(next) {
         request(app)
@@ -81,7 +81,7 @@ describe('edit posts', () => {
         const title = 'authorized';
         const body = 'authorized';
         request(app)
-          .put(`/post/edit/${objectID}`)
+          .delete(`/post/delete/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
@@ -89,7 +89,7 @@ describe('edit posts', () => {
       },
     ]);
   });
-  test('user needs to be authorized', (done) => {
+  test.skip('user needs to be authorized', (done) => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
@@ -98,7 +98,7 @@ describe('edit posts', () => {
       .send({ title, body })
       .expect(401, done);
   });
-  test('user needs to be superUser', (done) => {
+  test.skip('user needs to be superUser', (done) => {
     const title = 'not superUser';
     const body = 'not superUser';
     async.waterfall([

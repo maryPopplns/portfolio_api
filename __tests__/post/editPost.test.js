@@ -97,7 +97,7 @@ describe('edit posts', () => {
       .send({ title, body })
       .expect(401, done);
   });
-  test.skip('user needs to be superUser', (done) => {
+  test('user needs to be superUser', (done) => {
     const title = 'not superUser';
     const body = 'not superUser';
     async.waterfall([
@@ -110,9 +110,9 @@ describe('edit posts', () => {
             cb(null, res.body.token);
           });
       },
-      function attemptToPost(token) {
+      function attemptToEdit(token) {
         request(app)
-          .post('/post/create')
+          .put(`/post/edit/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })

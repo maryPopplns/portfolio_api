@@ -76,11 +76,3 @@ function createComment() {
 // createUser();
 // createPost();
 // createComment();
-
-() => {
-  Post.findByIdAndUpdate('624352ccca85908428fb3e4b', { likes: 4 })
-    .then((result) => logger.info(`result: ${result}`))
-    .catch((error) => logger.error(error))
-    .finally(() => closeConnection());
-  // 624352ccca85908428fb3e4b
-};

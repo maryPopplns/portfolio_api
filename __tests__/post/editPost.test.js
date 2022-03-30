@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const async = require('async');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const { logger } = require(path.join(__dirname, '../../config/logger'));
 // setups
 const { app, request } = require(path.join(__dirname, '../setup/appSetup'));
@@ -17,10 +18,14 @@ app.use('/post', postRoute);
 app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
+const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('create posts', () => {
+describe('edit posts', () => {
   // initialize DB
   mongoDB();
+
+  // objectID of post to edit
+  const objectID = mongoose.Types.ObjectId();
 
   async function createUsers() {
     let salt;
@@ -49,13 +54,18 @@ describe('create posts', () => {
       username: 'michael',
       password: hashedPassword,
     }).catch((error) => logger.error(`${error}`));
+    await Post.create({
+      _id: objectID,
+      title: 'title of the post',
+      body: 'body of the post',
+    }).catch((error) => logger.error(`${error}`));
   }
 
   beforeAll(createUsers);
 
   // create user before each test
 
-  test('able to create posts', (done) => {
+  test('able to edit posts', (done) => {
     async.waterfall([
       function getToken(next) {
         request(app)
@@ -66,19 +76,19 @@ describe('create posts', () => {
             next(null, res.body.token);
           });
       },
-      function createPost(token) {
+      function editPost(token) {
         const title = 'authorized';
         const body = 'authorized';
         request(app)
-          .post('/post/create')
+          .put(`/post/edit/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
-          .expect(201, done);
+          .expect(200, done);
       },
     ]);
   });
-  test('user needs to be authorized', (done) => {
+  test.skip('user needs to be authorized', (done) => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
@@ -87,7 +97,9 @@ describe('create posts', () => {
       .send({ title, body })
       .expect(401, done);
   });
-  test('user needs to be superUser', (done) => {
+  test.skip('user needs to be superUser', (done) => {
+    const title = 'not superUser';
+    const body = 'not superUser';
     async.waterfall([
       function getToken(cb) {
         request(app)
@@ -99,8 +111,6 @@ describe('create posts', () => {
           });
       },
       function attemptToPost(token) {
-        const title = 'not superUser';
-        const body = 'not superUser';
         request(app)
           .post('/post/create')
           .set('Authorization', `Bearer ${token}`)

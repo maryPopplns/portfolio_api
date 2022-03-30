@@ -32,6 +32,11 @@ exports.editPost = [
     req.user && next();
     !req.user && res.status(401).json({ messsage: 'unauthorized' });
   },
+  function isSuperUser(req, res, next) {
+    const isSuperUser = req.user.superUser;
+    isSuperUser && next();
+    !isSuperUser && res.status(403).json({ message: 'forbidden' });
+  },
   function hola(req, res, next) {
     res.end('hola');
   },

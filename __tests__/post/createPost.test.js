@@ -89,7 +89,6 @@ describe('create posts', () => {
   test('user needs to be superUser', (done) => {
     const title = 'title needs to be superUser';
     const body = 'body needs to be superUser';
-    // when I attempt to create bearer token in createUser function, I am getting undefined.
     async.waterfall([
       function getToken(cb) {
         request(app)

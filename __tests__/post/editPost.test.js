@@ -88,11 +88,11 @@ describe('edit posts', () => {
       },
     ]);
   });
-  test.skip('user needs to be authorized', (done) => {
+  test('user needs to be authorized', (done) => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
-      .post('/post/create')
+      .put(`/post/edit/${objectID}`)
       .type('form')
       .send({ title, body })
       .expect(401, done);

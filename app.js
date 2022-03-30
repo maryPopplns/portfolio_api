@@ -26,7 +26,7 @@ app.use(auth);
 // routes
 app.use('/user', userRoute);
 app.use('/post', postRoute);
-// remaining requests go to client
+// client route
 app.use('/client', function (req, res) {
   res.sendFile(path.join(__dirname, './public/index.html'));
 });

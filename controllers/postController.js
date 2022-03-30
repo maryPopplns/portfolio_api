@@ -49,3 +49,22 @@ exports.editPost = [
       .catch((error) => next(error));
   },
 ];
+
+exports.deletePost = [
+  function isLoggedIn(req, res, next) {
+    req.user && next();
+    !req.user && res.status(401).json({ messsage: 'unauthorized' });
+  },
+  function isSuperUser(req, res, next) {
+    const isSuperUser = req.user.superUser;
+    isSuperUser && next();
+    !isSuperUser && res.status(403).json({ message: 'forbidden' });
+  },
+  function editPost(req, res, next) {
+    const postID = req.params.id;
+
+    Post.findByIdAndDelete(postID)
+      .then(() => res.json({ message: 'post has been deleted' }))
+      .catch((error) => next(error));
+  },
+];

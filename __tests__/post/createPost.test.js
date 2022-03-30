@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const async = require('async');
 const bcrypt = require('bcryptjs');
 const { logger } = require(path.join(__dirname, '../../config/logger'));
 // setups
@@ -56,18 +57,25 @@ describe('create posts', () => {
   test('able to create posts', (done) => {
     const title = 'title of the post';
     const body = 'body of the post';
-    request(app)
-      .post('/user/login')
-      .type('form')
-      .send({ username: 'spencer', password: '123' })
-      .then((res) => {
+    async.waterfall([
+      function getToken(next) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            next(null, res.body.token);
+          });
+      },
+      function createPost(token) {
         request(app)
           .post('/post/create')
-          .set('Authorization', `Bearer ${res.body.token}`)
+          .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
           .expect(201, done);
-      });
+      },
+    ]);
   });
   test('user needs to be authorized', (done) => {
     const title = 'title not authorized';
@@ -82,17 +90,24 @@ describe('create posts', () => {
     const title = 'title needs to be superUser';
     const body = 'body needs to be superUser';
     // when I attempt to create bearer token in createUser function, I am getting undefined.
-    request(app)
-      .post('/user/login')
-      .type('form')
-      .send({ username: 'michael', password: '123' })
-      .then((res) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'michael', password: '123' })
+          .then((res) => {
+            cb(null, res.body.token);
+          });
+      },
+      function attemptToPost(token) {
         request(app)
           .post('/post/create')
-          .set('Authorization', `Bearer ${res.body.token}`)
+          .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
           .expect(403, done);
-      });
+      },
+    ]);
   });
 });

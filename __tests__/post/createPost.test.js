@@ -21,14 +21,7 @@ describe('create posts', () => {
   // initialize DB
   mongoDB();
 
-  // generated bearer tokens
-  let token;
-  async function createUser() {
-    const username = 'spencer';
-    const username2 = 'michael';
-    const password = '123';
-    const superUser = true;
-
+  async function createUsers() {
     let salt;
     let hashedPassword;
 
@@ -40,34 +33,23 @@ describe('create posts', () => {
 
     // create hashed password
     await bcrypt
-      .hash(password, salt)
+      .hash('123', salt)
       .then((result) => (hashedPassword = result))
       .catch((error) => logger.error(`${error}`));
 
-    // create/save user
+    // create users
     await User.create({
-      username,
+      username: 'spencer',
       password: hashedPassword,
-      superUser,
+      superUser: true,
     }).catch((error) => logger.error(`${error}`));
     await User.create({
-      username: username2,
+      username: 'michael',
       password: hashedPassword,
-    })
-      // .then((result) => logger.debug(`create user result: \n ${result} \n`))
-      .catch((error) => logger.error(`${error}`));
-
-    // get user's bearer token
-    await request(app)
-      .post('/user/login')
-      .type('form')
-      .send({ username, password })
-      .then((res) => {
-        token = `Bearer ${res.body.token}`;
-      });
+    }).catch((error) => logger.error(`${error}`));
   }
 
-  beforeEach(createUser);
+  beforeEach(createUsers);
 
   // create user before each test
 
@@ -75,11 +57,17 @@ describe('create posts', () => {
     const title = 'title of the post';
     const body = 'body of the post';
     request(app)
-      .post('/post/create')
-      .set('Authorization', token)
+      .post('/user/login')
       .type('form')
-      .send({ title, body })
-      .expect(201, done);
+      .send({ username: 'spencer', password: '123' })
+      .then((res) => {
+        request(app)
+          .post('/post/create')
+          .set('Authorization', `Bearer ${res.body.token}`)
+          .type('form')
+          .send({ title, body })
+          .expect(201, done);
+      });
   });
   test('user needs to be authorized', (done) => {
     const title = 'title not authorized';

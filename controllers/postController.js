@@ -37,7 +37,15 @@ exports.editPost = [
     isSuperUser && next();
     !isSuperUser && res.status(403).json({ message: 'forbidden' });
   },
-  function hola(req, res, next) {
-    res.end('hola');
+  function editPost(req, res, next) {
+    const postID = req.params.id;
+    const updatedPost = {
+      title: req.body.title,
+      body: req.body.body,
+    };
+
+    Post.findByIdAndUpdate(postID, updatedPost)
+      .then(() => res.json({ message: 'post has been updated' }))
+      .catch((error) => next(error));
   },
 ];

@@ -7,6 +7,6 @@ const { createPost, editPost } = require(path.join(
 ));
 
 router.post('/create', createPost);
-router.put('/edit', editPost);
+router.put('/edit/:id', editPost);
 
 module.exports = router;

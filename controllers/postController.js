@@ -26,3 +26,13 @@ exports.createPost = [
       .catch((error) => next(error));
   },
 ];
+
+exports.editPost = [
+  function isLoggedIn(req, res, next) {
+    req.user && next();
+    !req.user && res.status(401).json({ messsage: 'unauthorized' });
+  },
+  function hola(req, res, next) {
+    res.end('hola');
+  },
+];

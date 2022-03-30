@@ -98,7 +98,7 @@ describe('delete posts', () => {
       .send({ title, body })
       .expect(401, done);
   });
-  test.skip('user needs to be superUser', (done) => {
+  test('user needs to be superUser', (done) => {
     const title = 'not superUser';
     const body = 'not superUser';
     async.waterfall([
@@ -111,9 +111,9 @@ describe('delete posts', () => {
             cb(null, res.body.token);
           });
       },
-      function attemptToEdit(token) {
+      function attemptToDelete(token) {
         request(app)
-          .put(`/post/edit/${objectID}`)
+          .delete(`/post/delete/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })

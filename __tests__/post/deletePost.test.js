@@ -21,13 +21,13 @@ const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
 describe('DELETE /post/:id', () => {
-  // initialize DB
-  mongoDB();
-
   // objectID of post to edit
   const objectID = mongoose.Types.ObjectId();
 
-  function createUsers() {
+  beforeAll(function () {
+    // initialize DB
+    mongoDB();
+
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 
@@ -51,9 +51,7 @@ describe('DELETE /post/:id', () => {
       title: 'title of the post',
       body: 'body of the post',
     }).catch((error) => logger.error(`${error}`));
-  }
-
-  beforeAll(createUsers);
+  });
 
   // create user before each test
 

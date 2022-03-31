@@ -21,24 +21,48 @@ const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
 describe('PUT /post/like/:id', () => {
-  // initialize DB
-  mongoDB();
+  beforeAll(function () {
+    // initialize DB
+    mongoDB();
 
-  async function createUsers() {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 
-    // super user
-    await User.create({
+    Post.create({
+      title: 'title',
+      body: 'body',
+    }).catch((error) => logger.error(`${error}`));
+    User.create({
       username: 'spencer',
       password: hashedPassword,
     }).catch((error) => logger.error(`${error}`));
-  }
+  });
 
-  beforeAll(createUsers);
-
-  test.skip('user needs to be superUser', (done) => {
-    expect(1).toBe(1);
-    done();
+  test('users can like posts', (done) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            cb(null, res.body.token);
+          });
+      },
+      function getPostID(token, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const ID = res.body[0]._id;
+            cb(null, token, ID);
+          });
+      },
+      function likePost(token, ID) {
+        request(app)
+          .put(`/post/like/${ID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(201, done);
+      },
+    ]);
   });
 });

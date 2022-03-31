@@ -19,10 +19,10 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 
 describe('create posts', () => {
-  // initialize DB
-  mongoDB();
+  beforeAll(function () {
+    // initialize DB
+    mongoDB();
 
-  function createUsers() {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 
@@ -39,9 +39,7 @@ describe('create posts', () => {
         password: hashedPassword,
       },
     ]).catch((error) => logger.error(`${error}`));
-  }
-
-  beforeAll(createUsers);
+  });
 
   // create user before each test
 

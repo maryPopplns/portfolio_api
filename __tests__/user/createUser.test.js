@@ -11,7 +11,7 @@ const User = require(path.join(__dirname, '../../models/user'));
 
 describe('POST /user/create', () => {
   // initialize DB
-  mongoDB();
+  beforeAll(mongoDB);
 
   test('able to create users', (done) => {
     request(app)
@@ -26,7 +26,7 @@ describe('POST /user/create', () => {
     User.create({
       username: 'spencer',
       password: '123',
-    }).catch((error) => {
+    }).catch(() => {
       logger.error('error creating setup user');
       done();
     });

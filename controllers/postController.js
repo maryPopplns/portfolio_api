@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const { check } = require('express-validator');
+const { isLoggedIn, isSuperUser } = require(path.join(__dirname, './auth'));
 
 const Post = require(path.join(__dirname, '../models/post'));
 
@@ -12,15 +13,8 @@ exports.getPosts = function (req, res, next) {
 };
 
 exports.createPost = [
-  function isLoggedIn(req, res, next) {
-    req.user && next();
-    !req.user && res.status(401).json({ messsage: 'unauthorized' });
-  },
-  function isSuperUser(req, res, next) {
-    const isSuperUser = req.user.superUser;
-    isSuperUser && next();
-    !isSuperUser && res.status(403).json({ message: 'forbidden' });
-  },
+  isLoggedIn,
+  isSuperUser,
   check('title').trim().escape(),
   check('body').trim().escape(),
   function savePost(req, res, next) {
@@ -35,15 +29,8 @@ exports.createPost = [
 ];
 
 exports.editPost = [
-  function isLoggedIn(req, res, next) {
-    req.user && next();
-    !req.user && res.status(401).json({ messsage: 'unauthorized' });
-  },
-  function isSuperUser(req, res, next) {
-    const isSuperUser = req.user.superUser;
-    isSuperUser && next();
-    !isSuperUser && res.status(403).json({ message: 'forbidden' });
-  },
+  isLoggedIn,
+  isSuperUser,
   function editPost(req, res, next) {
     const postID = req.params.id;
     const updatedPost = {
@@ -58,15 +45,8 @@ exports.editPost = [
 ];
 
 exports.deletePost = [
-  function isLoggedIn(req, res, next) {
-    req.user && next();
-    !req.user && res.status(401).json({ messsage: 'unauthorized' });
-  },
-  function isSuperUser(req, res, next) {
-    const isSuperUser = req.user.superUser;
-    isSuperUser && next();
-    !isSuperUser && res.status(403).json({ message: 'forbidden' });
-  },
+  isLoggedIn,
+  isSuperUser,
   function editPost(req, res, next) {
     const postID = req.params.id;
 

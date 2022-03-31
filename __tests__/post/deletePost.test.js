@@ -71,6 +71,7 @@ describe('DELETE /post/:id', () => {
       function editPost(token) {
         const title = 'authorized';
         const body = 'authorized';
+
         request(app)
           .delete(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
@@ -83,6 +84,7 @@ describe('DELETE /post/:id', () => {
   test('user needs to be authorized', (done) => {
     const title = 'not authorized';
     const body = 'not authorized';
+
     request(app)
       .delete(`/post/${objectID}`)
       .type('form')
@@ -92,6 +94,7 @@ describe('DELETE /post/:id', () => {
   test('user needs to be superUser', (done) => {
     const title = 'not superUser';
     const body = 'not superUser';
+
     async.waterfall([
       function getToken(cb) {
         request(app)

@@ -25,21 +25,6 @@ describe('PUT /post/like/:id', () => {
   mongoDB();
 
   async function createUsers() {
-    // let salt;
-    // let hashedPassword;
-
-    // // create salt
-    // await bcrypt
-    //   .genSalt(10)
-    //   .then((result) => (salt = result))
-    //   .catch((error) => logger.error(`${error}`));
-
-    // // create hashed password
-    // await bcrypt
-    //   .hash('123', salt)
-    //   .then((result) => (hashedPassword = result))
-    //   .catch((error) => logger.error(`${error}`));
-
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 

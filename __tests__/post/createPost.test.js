@@ -22,33 +22,23 @@ describe('create posts', () => {
   // initialize DB
   mongoDB();
 
-  async function createUsers() {
-    let salt;
-    let hashedPassword;
+  function createUsers() {
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync('123', salt);
 
-    // create salt
-    await bcrypt
-      .genSalt(10)
-      .then((result) => (salt = result))
-      .catch((error) => logger.error(`${error}`));
-
-    // create hashed password
-    await bcrypt
-      .hash('123', salt)
-      .then((result) => (hashedPassword = result))
-      .catch((error) => logger.error(`${error}`));
-
-    // super user
-    await User.create({
-      username: 'spencer',
-      password: hashedPassword,
-      superUser: true,
-    }).catch((error) => logger.error(`${error}`));
-    // non super user
-    await User.create({
-      username: 'michael',
-      password: hashedPassword,
-    }).catch((error) => logger.error(`${error}`));
+    User.insertMany([
+      {
+        // super user
+        username: 'spencer',
+        password: hashedPassword,
+        superUser: true,
+      },
+      {
+        // non super user
+        username: 'michael',
+        password: hashedPassword,
+      },
+    ]).catch((error) => logger.error(error));
   }
 
   beforeAll(createUsers);

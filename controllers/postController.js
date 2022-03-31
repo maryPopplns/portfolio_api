@@ -55,3 +55,18 @@ exports.deletePost = [
       .catch((error) => next(error));
   },
 ];
+
+exports.likePost = [
+  isLoggedIn,
+  function preventDoubleLike(req, res, next) {
+    const likedPosts = req.user.likedPosts;
+    const selectedBlog = req.params.id;
+    const alreadyLiked = likedPosts.includes(selectedBlog);
+
+    alreadyLiked && res.status(400).json({ message: 'Currently liked' });
+    !alreadyLiked && next();
+  },
+  function preventDoubleLike(req, res, next) {
+    res.end('not liked yet');
+  },
+];

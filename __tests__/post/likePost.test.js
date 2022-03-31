@@ -65,4 +65,39 @@ describe('PUT /post/like/:id', () => {
       },
     ]);
   });
+  test('users can like post once', (done) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            cb(null, res.body.token);
+          });
+      },
+      function getPostID(token, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const ID = res.body[0]._id;
+            cb(null, token, ID);
+          });
+      },
+      function likePost(token, ID, cb) {
+        request(app)
+          .put(`/post/like/${ID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .then(() => {
+            cb(null, token, ID);
+          });
+      },
+      function likePostAgain(token, ID) {
+        request(app)
+          .put(`/post/like/${ID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(400, done);
+      },
+    ]);
+  });
 });

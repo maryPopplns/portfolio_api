@@ -19,7 +19,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('PUT /post/like/:id', () => {
+describe('PUT /post/unlike/:id', () => {
   beforeAll(function () {
     // initialize DB
     mongoDB();
@@ -37,34 +37,7 @@ describe('PUT /post/like/:id', () => {
     }).catch((error) => logger.error(`${error}`));
   });
 
-  test('users can like posts', (done) => {
-    async.waterfall([
-      function getToken(cb) {
-        request(app)
-          .post('/user/login')
-          .type('form')
-          .send({ username: 'spencer', password: '123' })
-          .then((res) => {
-            cb(null, res.body.token);
-          });
-      },
-      function getPostID(token, cb) {
-        request(app)
-          .get('/post')
-          .then((res) => {
-            const ID = res.body[0]._id;
-            cb(null, token, ID);
-          });
-      },
-      function likePost(token, ID) {
-        request(app)
-          .put(`/post/like/${ID}`)
-          .set('Authorization', `Bearer ${token}`)
-          .expect(201, done);
-      },
-    ]);
-  });
-  test('users can like post once', (done) => {
+  test('users can unlike posts', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)
@@ -84,6 +57,7 @@ describe('PUT /post/like/:id', () => {
           });
       },
       function likePost(token, ID, cb) {
+        // like the post first
         request(app)
           .put(`/post/like/${ID}`)
           .set('Authorization', `Bearer ${token}`)
@@ -91,9 +65,45 @@ describe('PUT /post/like/:id', () => {
             cb(null, token, ID);
           });
       },
-      function likePostAgain(token, ID) {
+      function unlikePost(token, ID) {
+        // then unlike
         request(app)
-          .put(`/post/like/${ID}`)
+          .put(`/post/unlike/${ID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(201, done);
+      },
+    ]);
+  });
+  test('users can unlike post once', (done) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            cb(null, res.body.token);
+          });
+      },
+      function getPostID(token, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const ID = res.body[0]._id;
+            cb(null, token, ID);
+          });
+      },
+      function unlikePost(token, ID, cb) {
+        request(app)
+          .put(`/post/unlike/${ID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .then(() => {
+            cb(null, token, ID);
+          });
+      },
+      function unlikePostAgain(token, ID) {
+        request(app)
+          .put(`/post/unlike/${ID}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(400, done);
       },
@@ -109,8 +119,8 @@ describe('PUT /post/like/:id', () => {
             cb(null, ID);
           });
       },
-      function likePost(ID) {
-        request(app).put(`/post/like/${ID}`).expect(401, done);
+      function unlikePost(ID) {
+        request(app).put(`/post/unlike/${ID}`).expect(401, done);
       },
     ]);
   });

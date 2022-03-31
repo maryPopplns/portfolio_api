@@ -4,8 +4,11 @@ const { check } = require('express-validator');
 
 const Post = require(path.join(__dirname, '../models/post'));
 
-exports.getPosts = function (res, req, next) {
-  res.end('get posts');
+exports.getPosts = function (req, res, next) {
+  Post.find()
+    .lean()
+    .then((posts) => res.json(posts))
+    .catch((error) => next(error));
 };
 
 exports.createPost = [

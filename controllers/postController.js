@@ -1,9 +1,11 @@
 require('dotenv').config();
 const path = require('path');
+const async = require('async');
 const { check } = require('express-validator');
 const { isLoggedIn, isSuperUser } = require(path.join(__dirname, './auth'));
 
 const Post = require(path.join(__dirname, '../models/post'));
+const User = require(path.join(__dirname, '../models/user'));
 
 exports.getPosts = function (req, res, next) {
   Post.find()
@@ -18,7 +20,6 @@ exports.createPost = [
   check('title').trim().escape(),
   check('body').trim().escape(),
   function savePost(req, res, next) {
-    // create/save post
     Post.create({
       title: req.body.title,
       body: req.body.body,
@@ -63,10 +64,39 @@ exports.likePost = [
     const selectedBlog = req.params.id;
     const alreadyLiked = likedPosts.includes(selectedBlog);
 
+    // post has been liked
     alreadyLiked && res.status(400).json({ message: 'Currently liked' });
+    // post has not been liked
     !alreadyLiked && next();
   },
-  function preventDoubleLike(req, res, next) {
-    res.end('not liked yet');
+  function (req, res, next) {
+    const selectedBlog = req.params.id;
+    const userID = req.user.id;
+
+    async
+      .parallel([
+        function incrementLikes(done) {
+          // increment post likes
+          Post.findByIdAndUpdate(
+            selectedBlog,
+            { $inc: { likes: 1 } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+        function pushPost(done) {
+          // add postID to user like list
+          User.findByIdAndUpdate(
+            userID,
+            { $push: { likedPosts: selectedBlog } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+      ])
+      .then(() => res.status(201).json({ message: 'Post has been liked' }))
+      .catch((error) => next(error));
   },
 ];

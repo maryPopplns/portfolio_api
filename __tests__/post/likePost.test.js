@@ -100,4 +100,19 @@ describe('PUT /post/like/:id', () => {
       },
     ]);
   });
+  test('users must be logged in', (done) => {
+    async.waterfall([
+      function getPostID(cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const ID = res.body[0]._id;
+            cb(null, ID);
+          });
+      },
+      function attemptToLikePost(ID) {
+        request(app).put(`/post/like/${ID}`).expect(401, done);
+      },
+    ]);
+  });
 });

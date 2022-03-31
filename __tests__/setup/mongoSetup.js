@@ -12,7 +12,6 @@ async function initializeMongoServer() {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     })
-    .then(() => logger.info(`MEMORY-MONGO | DB connection successful 🔓`))
     .catch((error) => logger.error(`MEMORY-MONGO | ${error}`));
 }
 

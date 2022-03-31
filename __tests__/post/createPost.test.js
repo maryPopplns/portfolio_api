@@ -55,7 +55,7 @@ describe('create posts', () => {
 
   // create user before each test
 
-  test('POST post/create', (done) => {
+  test('POST /post', (done) => {
     async.waterfall([
       function getToken(next) {
         request(app)
@@ -70,7 +70,7 @@ describe('create posts', () => {
         const title = 'authorized';
         const body = 'authorized';
         request(app)
-          .post('/post/create')
+          .post('/post')
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
@@ -82,7 +82,7 @@ describe('create posts', () => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
-      .post('/post/create')
+      .post('/post')
       .type('form')
       .send({ title, body })
       .expect(401, done);
@@ -102,7 +102,7 @@ describe('create posts', () => {
         const title = 'not superUser';
         const body = 'not superUser';
         request(app)
-          .post('/post/create')
+          .post('/post')
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })

@@ -4,6 +4,10 @@ const { check } = require('express-validator');
 
 const Post = require(path.join(__dirname, '../models/post'));
 
+exports.getPosts = function (res, req, next) {
+  res.end('get posts');
+};
+
 exports.createPost = [
   function isLoggedIn(req, res, next) {
     req.user && next();

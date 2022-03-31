@@ -20,7 +20,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('PUT edit/:id', () => {
+describe('PUT /post/:id', () => {
   // initialize DB
   mongoDB();
 
@@ -81,7 +81,7 @@ describe('PUT edit/:id', () => {
         const title = 'authorized';
         const body = 'authorized';
         request(app)
-          .put(`/post/edit/${objectID}`)
+          .put(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
@@ -93,7 +93,7 @@ describe('PUT edit/:id', () => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
-      .put(`/post/edit/${objectID}`)
+      .put(`/post/${objectID}`)
       .type('form')
       .send({ title, body })
       .expect(401, done);
@@ -113,7 +113,7 @@ describe('PUT edit/:id', () => {
       },
       function attemptToEdit(token) {
         request(app)
-          .put(`/post/edit/${objectID}`)
+          .put(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })

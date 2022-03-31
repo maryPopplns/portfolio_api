@@ -20,7 +20,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('DELETE post/delete/:id', () => {
+describe('DELETE /post/:id', () => {
   // initialize DB
   mongoDB();
 
@@ -81,7 +81,7 @@ describe('DELETE post/delete/:id', () => {
         const title = 'authorized';
         const body = 'authorized';
         request(app)
-          .delete(`/post/delete/${objectID}`)
+          .delete(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
@@ -93,7 +93,7 @@ describe('DELETE post/delete/:id', () => {
     const title = 'not authorized';
     const body = 'not authorized';
     request(app)
-      .delete(`/post/delete/${objectID}`)
+      .delete(`/post/${objectID}`)
       .type('form')
       .send({ title, body })
       .expect(401, done);
@@ -113,7 +113,7 @@ describe('DELETE post/delete/:id', () => {
       },
       function attemptToDelete(token) {
         request(app)
-          .delete(`/post/delete/${objectID}`)
+          .delete(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })

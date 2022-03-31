@@ -16,7 +16,7 @@ const { loginUser } = require(path.join(
   '../../controllers/userController'
 ));
 
-describe('POST user/login', () => {
+describe('POST /user/login', () => {
   // initialize DB
   mongoDB();
 

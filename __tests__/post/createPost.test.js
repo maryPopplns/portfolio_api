@@ -38,7 +38,7 @@ describe('create posts', () => {
         username: 'michael',
         password: hashedPassword,
       },
-    ]).catch((error) => logger.error(error));
+    ]).catch((error) => logger.error(`${error}`));
   }
 
   beforeAll(createUsers);

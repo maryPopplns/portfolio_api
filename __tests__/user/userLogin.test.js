@@ -10,37 +10,18 @@ const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
-// login controller
-const { loginUser } = require(path.join(
-  __dirname,
-  '../../controllers/userController'
-));
 
 describe('POST /user/login', () => {
   // initialize DB
   mongoDB();
 
-  async function createUser() {
-    const username = 'spencer';
-    const password = '123';
-    let salt;
-    let hashedPassword;
-
-    // create salt
-    await bcrypt
-      .genSalt(10)
-      .then((result) => (salt = result))
-      .catch((error) => logger.error(`${error}`));
-
-    // create hashed password
-    await bcrypt
-      .hash(password, salt)
-      .then((result) => (hashedPassword = result))
-      .catch((error) => logger.error(`${error}`));
+  function createUser() {
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync('123', salt);
 
     // create/save user
-    await User.create({
-      username: username,
+    User.create({
+      username: 'spencer',
       password: hashedPassword,
     }).catch((error) => logger.error(`${error}`));
   }

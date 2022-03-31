@@ -31,7 +31,7 @@ describe('GET /post', () => {
         title: 'third',
         body: 'third',
       },
-    ]).catch((error) => logger.error(error));
+    ]).catch((error) => logger.error(`${error}`));
 
     request(app)
       .get('/post')

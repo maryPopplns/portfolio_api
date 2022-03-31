@@ -26,7 +26,10 @@ describe('POST /user/create', () => {
     User.create({
       username: 'spencer',
       password: '123',
-    }).catch((error) => logger.error('error creating setup user'));
+    }).catch((error) => {
+      logger.error('error creating setup user');
+      done();
+    });
     // create a user w/ same username
     request(app)
       .post('/user/create')

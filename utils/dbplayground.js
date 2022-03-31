@@ -9,56 +9,39 @@ const Comment = require(path.join(__dirname, '../models/comment'));
 require(path.join(__dirname, '../config/mongodb'));
 const closeConnection = () => mongoose.connection.close();
 
-const username = 'michael';
-const password = '123';
-const superUser = false;
-
-async function createUser() {
-  // generate salt
-  let salt;
-  await bcrypt
-    .genSalt(10)
-    .then((result) => (salt = result))
-    .catch((error) => {
-      closeConnection();
-      return console.log(`error generating salt: ${error}`);
-    });
-
-  // hash password
-  let hashedPassword;
-  salt &&
-    (await bcrypt
-      .hash(password, salt)
-      .then((result) => (hashedPassword = result))
-      .catch((error) => {
-        closeConnection();
-        logger.error(`error generating hash: ${error}`);
-      }));
+function createUser() {
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync('123', salt);
 
   // create user
-  hashedPassword &&
-    (await User.create({
-      username: username,
+  User.insertMany([
+    {
+      username: 'spencer',
       password: hashedPassword,
-      superUser,
-    })
-      .then((result) => logger.info(result))
-      .catch((error) => logger.error(`error saving user: ${error}`))
-      .finally(() => {
-        closeConnection();
-      }));
+      superUser: true,
+    },
+    {
+      username: 'michael',
+      password: hashedPassword,
+    },
+  ])
+    .catch((error) => logger.error(`${error}`))
+    .finally(() => closeConnection());
 }
 
 function createPost() {
-  Post.create({
-    title: 'title',
-    body: 'body',
-  })
-    .then((result) => logger.info(result))
-    .catch((error) => logger.error(error))
-    .finally(() => {
-      closeConnection();
-    });
+  Post.insertMany([
+    {
+      title: 'title1',
+      body: 'body1',
+    },
+    {
+      title: 'title2',
+      body: 'body2',
+    },
+  ])
+    .catch((error) => logger.error(`${error}`))
+    .finally(() => closeConnection());
 }
 
 function createComment() {

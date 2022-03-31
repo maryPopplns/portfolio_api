@@ -85,7 +85,7 @@ exports.likePost = [
             .then(() => done(null))
             .catch((error) => done(error));
         },
-        function pushPost(done) {
+        function updateUser(done) {
           // add postID to user like list
           User.findByIdAndUpdate(
             userID,
@@ -98,5 +98,49 @@ exports.likePost = [
       ])
       .then(() => res.status(201).json({ message: 'Post has been liked' }))
       .catch((error) => next(error));
+  },
+];
+
+exports.unlikePost = [
+  isLoggedIn,
+  function preventDoubleUnlike(req, res, next) {
+    const likedPosts = req.user.likedPosts;
+    const selectedBlog = req.params.id;
+    const alreadyLiked = likedPosts.includes(selectedBlog);
+
+    // post has not been liked
+    !alreadyLiked && res.status(400).json({ message: 'Currently unliked' });
+    // post has been liked
+    alreadyLiked && next();
+  },
+  function (req, res, next) {
+    const selectedBlog = req.params.id;
+    const userID = req.user.id;
+
+    async
+      .parallel([
+        function decrementLikes(done) {
+          Post.findByIdAndUpdate(
+            selectedBlog,
+            { $inc: { likes: -1 } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => next(error));
+        },
+        function pullPost(done) {
+          User.findByIdAndUpdate(
+            userID,
+            { $pullAll: { likedPosts: [{ _id: selectedBlog }] } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => next(error));
+        },
+      ])
+      .then(() => res.status(201).json({ message: 'Post has been unliked' }))
+      .catch((error) => {
+        next(error);
+      });
   },
 ];

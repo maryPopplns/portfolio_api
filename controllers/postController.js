@@ -200,6 +200,37 @@ exports.deleteCommentPost = [
   isLoggedIn,
   isSuperUser,
   function (req, res, next) {
-    res.end('delete comment');
+    const commentID = req.params.commentID;
+    const userID = req.user.id;
+    const postID = req.params.postID;
+
+    async
+      .parallel([
+        function deleteComment(done) {
+          Comment.findByIdAndDelete(commentID)
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+        function updateUser(done) {
+          User.findByIdAndUpdate(
+            userID,
+            { $pullAll: { comments: [{ _id: commentID }] } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => next(error));
+        },
+        function updatePost(done) {
+          Post.findByIdAndUpdate(
+            postID,
+            { $pullAll: { comments: [{ _id: commentID }] } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => next(error));
+        },
+      ])
+      .then(() => res.json({ message: 'comment has been deleted' }))
+      .catch((error) => next(error));
   },
 ];

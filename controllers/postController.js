@@ -6,6 +6,7 @@ const { isLoggedIn, isSuperUser } = require(path.join(__dirname, './auth'));
 
 const Post = require(path.join(__dirname, '../models/post'));
 const User = require(path.join(__dirname, '../models/user'));
+const Comment = require(path.join(__dirname, '../models/comment'));
 
 exports.getPosts = function (req, res, next) {
   Post.find()
@@ -114,14 +115,14 @@ exports.unlikePost = [
     alreadyLiked && next();
   },
   function (req, res, next) {
-    const selectedBlog = req.params.postID;
+    const selectedPost = req.params.postID;
     const userID = req.user.id;
 
     async
       .parallel([
         function decrementLikes(done) {
           Post.findByIdAndUpdate(
-            selectedBlog,
+            selectedPost,
             { $inc: { likes: -1 } },
             { upsert: true, new: true }
           )
@@ -131,7 +132,7 @@ exports.unlikePost = [
         function pullPost(done) {
           User.findByIdAndUpdate(
             userID,
-            { $pullAll: { likedPosts: [{ _id: selectedBlog }] } },
+            { $pullAll: { likedPosts: [{ _id: selectedPost }] } },
             { upsert: true, new: true }
           )
             .then(() => done(null))
@@ -146,7 +147,51 @@ exports.unlikePost = [
 ];
 
 exports.commentPost = [
+  isLoggedIn,
+  check('comment').trim().escape(),
+  function createComment(req, res, next) {
+    const userID = req.user.id;
+    const postID = req.params.postID;
+    const userComment = req.body.comment;
+
+    Comment.create({
+      post: postID,
+      user: userID,
+      comment: userComment,
+    })
+      .then((result) => {
+        req.commentID = result.id;
+        next();
+      })
+      .catch((error) => next(error));
+  },
   function (req, res, next) {
-    res.end('comment post');
+    const userID = req.user.id;
+    const postID = req.params.postID;
+    const commentID = req.commentID;
+
+    async
+      .parallel([
+        function updateUser(done) {
+          User.findByIdAndUpdate(
+            userID,
+            { $push: { comments: commentID } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+        function updatePost(done) {
+          Post.findByIdAndUpdate(
+            postID,
+            { $push: { comments: commentID } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+      ])
+      .then(() => res.status(201).json({ message: 'comment added to post' }))
+      .catch((error) => next(error));
   },
 ];

@@ -195,3 +195,11 @@ exports.commentPost = [
       .catch((error) => next(error));
   },
 ];
+
+exports.deleteCommentPost = [
+  isLoggedIn,
+  isSuperUser,
+  function (req, res, next) {
+    res.end('delete comment');
+  },
+];

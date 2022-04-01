@@ -9,6 +9,7 @@ const {
   likePost,
   unlikePost,
   commentPost,
+  deleteCommentPost,
 } = require(path.join(__dirname, '../controllers/postController'));
 
 router.get('/', getPosts);
@@ -18,5 +19,6 @@ router.delete('/:postID', deletePost);
 router.put('/like/:postID', likePost);
 router.put('/unlike/:postID', unlikePost);
 router.post('/comment/:postID', commentPost);
+router.delete('/comment/:postID/:commentID', deleteCommentPost);
 
 module.exports = router;

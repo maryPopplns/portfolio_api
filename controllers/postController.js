@@ -33,7 +33,7 @@ exports.editPost = [
   isLoggedIn,
   isSuperUser,
   function editPost(req, res, next) {
-    const postID = req.params.id;
+    const postID = req.params.postID;
     const updatedPost = {
       title: req.body.title,
       body: req.body.body,
@@ -49,7 +49,7 @@ exports.deletePost = [
   isLoggedIn,
   isSuperUser,
   function editPost(req, res, next) {
-    const postID = req.params.id;
+    const postID = req.params.postID;
 
     Post.findByIdAndDelete(postID)
       .then(() => res.json({ message: 'post has been deleted' }))
@@ -61,7 +61,7 @@ exports.likePost = [
   isLoggedIn,
   function preventDoubleLike(req, res, next) {
     const likedPosts = req.user.likedPosts;
-    const selectedBlog = req.params.id;
+    const selectedBlog = req.params.postID;
     const alreadyLiked = likedPosts.includes(selectedBlog);
 
     // post has been liked
@@ -70,7 +70,7 @@ exports.likePost = [
     !alreadyLiked && next();
   },
   function (req, res, next) {
-    const selectedBlog = req.params.id;
+    const selectedBlog = req.params.postID;
     const userID = req.user.id;
 
     async
@@ -105,7 +105,7 @@ exports.unlikePost = [
   isLoggedIn,
   function preventDoubleUnlike(req, res, next) {
     const likedPosts = req.user.likedPosts;
-    const selectedBlog = req.params.id;
+    const selectedBlog = req.params.postID;
     const alreadyLiked = likedPosts.includes(selectedBlog);
 
     // post has not been liked
@@ -114,7 +114,7 @@ exports.unlikePost = [
     alreadyLiked && next();
   },
   function (req, res, next) {
-    const selectedBlog = req.params.id;
+    const selectedBlog = req.params.postID;
     const userID = req.user.id;
 
     async
@@ -142,5 +142,11 @@ exports.unlikePost = [
       .catch((error) => {
         next(error);
       });
+  },
+];
+
+exports.commentPost = [
+  function (req, res, next) {
+    res.end('comment post');
   },
 ];

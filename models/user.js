@@ -8,7 +8,7 @@ const userSchema = new Schema({
   superUser: { type: Boolean, required: true, default: false },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   likedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
-  commentLikes: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  likedComments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 });
 
 module.exports = mongoose.model('User', userSchema);

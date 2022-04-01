@@ -20,7 +20,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('PUT /post/:id', () => {
+describe('PUT /post/:postID', () => {
   // objectID of post to edit
   const objectID = mongoose.Types.ObjectId();
 

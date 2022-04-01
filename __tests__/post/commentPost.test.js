@@ -2,7 +2,6 @@ require('dotenv').config();
 const path = require('path');
 const async = require('async');
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 const { logger } = require(path.join(__dirname, '../../config/logger'));
 // setups
 const { app, request } = require(path.join(__dirname, '../setup/appSetup'));
@@ -20,10 +19,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('DELETE /post/:postID', () => {
-  // objectID of post to edit
-  const objectID = mongoose.Types.ObjectId();
-
+describe('POST /post/comment/:postID', () => {
   beforeAll(function () {
     // initialize DB
     mongoDB();
@@ -31,85 +27,58 @@ describe('DELETE /post/:postID', () => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 
-    User.insertMany([
-      {
-        // super user
-        username: 'spencer',
-        password: hashedPassword,
-        superUser: true,
-      },
-      {
-        // non super user
-        username: 'michael',
-        password: hashedPassword,
-      },
-    ]).catch((error) => logger.error(error));
-
-    // post
     Post.create({
-      _id: objectID,
-      title: 'title of the post',
-      body: 'body of the post',
+      title: 'title',
+      body: 'body',
+    }).catch((error) => logger.error(`${error}`));
+    User.create({
+      username: 'spencer',
+      password: hashedPassword,
     }).catch((error) => logger.error(`${error}`));
   });
 
-  // create user before each test
-
-  test('able to delete posts', (done) => {
-    async.waterfall([
-      function getToken(next) {
-        request(app)
-          .post('/user/login')
-          .type('form')
-          .send({ username: 'spencer', password: '123' })
-          .then((res) => {
-            next(null, res.body.token);
-          });
-      },
-      function editPost(token) {
-        const title = 'authorized';
-        const body = 'authorized';
-
-        request(app)
-          .delete(`/post/${objectID}`)
-          .set('Authorization', `Bearer ${token}`)
-          .type('form')
-          .send({ title, body })
-          .expect(200, done);
-      },
-    ]);
-  });
-  test('user needs to be authorized', (done) => {
-    const title = 'not authorized';
-    const body = 'not authorized';
-
-    request(app)
-      .delete(`/post/${objectID}`)
-      .type('form')
-      .send({ title, body })
-      .expect(401, done);
-  });
-  test('user needs to be superUser', (done) => {
-    const title = 'not superUser';
-    const body = 'not superUser';
-
+  test('users can comment on posts', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)
           .post('/user/login')
           .type('form')
-          .send({ username: 'michael', password: '123' })
+          .send({ username: 'spencer', password: '123' })
           .then((res) => {
-            cb(null, res.body.token);
+            const userID = res.body.user._id;
+            const token = res.body.token;
+            cb(null, token, userID);
           });
       },
-      function attemptToDelete(token) {
+      function createPost(token, userID, cb) {
+        const title = 'authorized';
+        const body = 'authorized';
         request(app)
-          .delete(`/post/${objectID}`)
+          .post('/post')
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
-          .expect(403, done);
+          .then(() => cb(null, token, userID));
+      },
+      function getPostID(token, userID, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const postID = res.body[0]._id;
+            cb(null, token, userID, postID);
+          });
+      },
+      function commentPost(token, userID, postID, cb) {
+        const comment = 'comment for the post';
+        const post = postID;
+        const user = userID;
+
+        request(app)
+          .post(`/post/comment/${postID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ comment, post, user })
+          .expect(201, done);
       },
     ]);
   });

@@ -19,7 +19,7 @@ app.use('/user', userRoute);
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('PUT /post/like/:id', () => {
+describe('PUT /post/like/:postID', () => {
   beforeAll(function () {
     // initialize DB
     mongoDB();

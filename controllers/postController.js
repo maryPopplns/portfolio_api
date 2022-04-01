@@ -196,7 +196,7 @@ exports.commentPost = [
   },
 ];
 
-exports.deleteCommentPost = [
+exports.deletePostComment = [
   isLoggedIn,
   isSuperUser,
   function (req, res, next) {

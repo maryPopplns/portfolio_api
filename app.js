@@ -3,9 +3,10 @@ const logger = require('morgan');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
+const miscRouter = require(path.join(__dirname, './routes/miscRoute'));
 const userRoute = require(path.join(__dirname, './routes/userRoute'));
 const postRoute = require(path.join(__dirname, './routes/postRoute'));
-const auth = require(path.join(__dirname, './middleware/jwtAuth.js'));
+const auth = require(path.join(__dirname, './middleware/jwtAuth'));
 
 const app = express();
 
@@ -24,12 +25,9 @@ require(path.join(__dirname, '/config/passport'));
 app.use(auth);
 
 // routes
+app.use('/', miscRouter);
 app.use('/user', userRoute);
 app.use('/post', postRoute);
-// client route
-app.use('/client', function (req, res) {
-  res.sendFile(path.join(__dirname, './public/index.html'));
-});
 
 // error handler
 app.use(function (error, req, res, next) {

@@ -54,9 +54,7 @@ describe('PUT /like/:postID/:commentID', () => {
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ title, body })
-          .then(() => {
-            cb(null, token, userID);
-          });
+          .then(() => cb(null, token, userID));
       },
       function getPostID(token, userID, cb) {
         request(app)
@@ -76,9 +74,7 @@ describe('PUT /like/:postID/:commentID', () => {
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ comment, post, user })
-          .then(() => {
-            cb(null, token, userID, postID);
-          });
+          .then(() => cb(null, token, userID, postID));
       },
       function getCommentID(token, userID, postID, cb) {
         request(app)
@@ -93,6 +89,72 @@ describe('PUT /like/:postID/:commentID', () => {
           .put(`/post/like/${postID}/${commentID}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(200, done);
+      },
+    ]);
+  });
+
+  test('users can like comments once', (done) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            const userID = res.body.user._id;
+            const token = res.body.token;
+            cb(null, token, userID);
+          });
+      },
+      function createPost(token, userID, cb) {
+        const title = 'authorized';
+        const body = 'authorized';
+        request(app)
+          .post('/post')
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ title, body })
+          .then(() => cb(null, token, userID));
+      },
+      function getPostID(token, userID, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const postID = res.body[0]._id;
+            cb(null, token, userID, postID);
+          });
+      },
+      function commentPost(token, userID, postID, cb) {
+        const comment = 'comment for the post';
+        const post = postID;
+        const user = userID;
+
+        request(app)
+          .post(`/post/comment/${postID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ comment, post, user })
+          .then(() => cb(null, token, userID, postID));
+      },
+      function getCommentID(token, userID, postID, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const commentID = res.body[0].comments[0];
+            cb(null, token, postID, commentID);
+          });
+      },
+      function likeComment(token, postID, commentID, cb) {
+        request(app)
+          .put(`/post/like/${postID}/${commentID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .then(() => cb(null, token, postID, commentID));
+      },
+      function likeCommentAgain(token, postID, commentID) {
+        request(app)
+          .put(`/post/like/${postID}/${commentID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .expect(400, done);
       },
     ]);
   });

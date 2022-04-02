@@ -97,8 +97,7 @@ describe('PUT /post/unlike/:postID', () => {
         request(app)
           .put(`/post/unlike/${ID}`)
           .set('Authorization', `Bearer ${token}`)
-          .then((res) => {
-            console.log(res.body);
+          .then(() => {
             cb(null, token, ID);
           });
       },

@@ -62,8 +62,8 @@ exports.likePost = [
   isLoggedIn,
   function preventDoubleLike(req, res, next) {
     const likedPosts = req.user.likedPosts;
-    const selectedBlog = req.params.postID;
-    const alreadyLiked = likedPosts.includes(selectedBlog);
+    const selectedPost = req.params.postID;
+    const alreadyLiked = likedPosts.includes(selectedPost);
 
     // post has been liked
     alreadyLiked && res.status(400).json({ message: 'Currently liked' });
@@ -71,7 +71,7 @@ exports.likePost = [
     !alreadyLiked && next();
   },
   function (req, res, next) {
-    const selectedBlog = req.params.postID;
+    const selectedPost = req.params.postID;
     const userID = req.user.id;
 
     async
@@ -79,7 +79,7 @@ exports.likePost = [
         function incrementLikes(done) {
           // increment post likes
           Post.findByIdAndUpdate(
-            selectedBlog,
+            selectedPost,
             { $inc: { likes: 1 } },
             { upsert: true, new: true }
           )
@@ -90,7 +90,7 @@ exports.likePost = [
           // add postID to user like list
           User.findByIdAndUpdate(
             userID,
-            { $push: { likedPosts: selectedBlog } },
+            { $push: { likedPosts: selectedPost } },
             { upsert: true, new: true }
           )
             .then(() => done(null))
@@ -106,8 +106,8 @@ exports.unlikePost = [
   isLoggedIn,
   function preventDoubleUnlike(req, res, next) {
     const likedPosts = req.user.likedPosts;
-    const selectedBlog = req.params.postID;
-    const alreadyLiked = likedPosts.includes(selectedBlog);
+    const selectedPost = req.params.postID;
+    const alreadyLiked = likedPosts.includes(selectedPost);
 
     // post has not been liked
     !alreadyLiked && res.status(400).json({ message: 'Currently unliked' });
@@ -231,6 +231,50 @@ exports.deletePostComment = [
         },
       ])
       .then(() => res.json({ message: 'comment has been deleted' }))
+      .catch((error) => next(error));
+  },
+];
+
+exports.likePostComment = [
+  isLoggedIn,
+  function preventDoubleLike(req, res, next) {
+    const likedComments = req.user.likedComments;
+    const selectedComment = req.params.commentID;
+    const alreadyLiked = likedComments.includes(selectedComment);
+
+    // comment has been liked
+    alreadyLiked && res.status(400).json({ message: 'Currently liked' });
+    // comment has not been liked
+    !alreadyLiked && next();
+  },
+  function (req, res, next) {
+    const selectedComment = req.params.commentID;
+    const userID = req.user._id;
+
+    async
+      .parallel([
+        function incrementLikes(done) {
+          // increment post likes
+          Comment.findByIdAndUpdate(
+            selectedComment,
+            { $inc: { likes: 1 } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+        function updateUser(done) {
+          // add postID to user like list
+          User.findByIdAndUpdate(
+            userID,
+            { $push: { likedComments: selectedComment } },
+            { upsert: true, new: true }
+          )
+            .then(() => done(null))
+            .catch((error) => done(error));
+        },
+      ])
+      .then(() => res.status(201).json({ message: 'Comment has been liked' }))
       .catch((error) => next(error));
   },
 ];

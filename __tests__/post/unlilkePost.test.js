@@ -70,7 +70,7 @@ describe('PUT /post/unlike/:postID', () => {
         request(app)
           .put(`/post/unlike/${ID}`)
           .set('Authorization', `Bearer ${token}`)
-          .expect(201, done);
+          .expect(200, done);
       },
     ]);
   });

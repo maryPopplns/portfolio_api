@@ -97,7 +97,7 @@ exports.likePost = [
             .catch((error) => done(error));
         },
       ])
-      .then(() => res.status(201).json({ message: 'Post has been liked' }))
+      .then(() => res.json({ message: 'Post has been liked' }))
       .catch((error) => next(error));
   },
 ];
@@ -139,7 +139,7 @@ exports.unlikePost = [
             .catch((error) => next(error));
         },
       ])
-      .then(() => res.status(201).json({ message: 'Post has been unliked' }))
+      .then(() => res.json({ message: 'Post has been unliked' }))
       .catch((error) => {
         next(error);
       });
@@ -274,7 +274,7 @@ exports.likePostComment = [
             .catch((error) => done(error));
         },
       ])
-      .then(() => res.status(201).json({ message: 'Comment has been liked' }))
+      .then(() => res.json({ message: 'Comment has been liked' }))
       .catch((error) => next(error));
   },
 ];

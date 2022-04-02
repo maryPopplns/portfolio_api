@@ -17,9 +17,8 @@ app.use('/post', postRoute);
 app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
-const Post = require(path.join(__dirname, '../../models/post'));
 
-describe('PUT /post/like/:postID', () => {
+describe('PUT /like/:postID/:commentID', () => {
   beforeAll(function () {
     // initialize DB
     mongoDB();
@@ -27,17 +26,14 @@ describe('PUT /post/like/:postID', () => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync('123', salt);
 
-    Post.create({
-      title: 'title',
-      body: 'body',
-    }).catch((error) => logger.error(`${error}`));
     User.create({
       username: 'spencer',
       password: hashedPassword,
+      superUser: true,
     }).catch((error) => logger.error(`${error}`));
   });
 
-  test('users can like posts', (done) => {
+  test('users can like comments', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)
@@ -45,72 +41,58 @@ describe('PUT /post/like/:postID', () => {
           .type('form')
           .send({ username: 'spencer', password: '123' })
           .then((res) => {
-            cb(null, res.body.token);
+            const userID = res.body.user._id;
+            const token = res.body.token;
+            cb(null, token, userID);
           });
       },
-      function getPostID(token, cb) {
+      function createPost(token, userID, cb) {
+        const title = 'authorized';
+        const body = 'authorized';
+        request(app)
+          .post('/post')
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ title, body })
+          .then(() => {
+            cb(null, token, userID);
+          });
+      },
+      function getPostID(token, userID, cb) {
         request(app)
           .get('/post')
           .then((res) => {
-            const ID = res.body[0]._id;
-            cb(null, token, ID);
+            const postID = res.body[0]._id;
+            cb(null, token, userID, postID);
           });
       },
-      function likePost(token, ID) {
+      function commentPost(token, userID, postID, cb) {
+        const comment = 'comment for the post';
+        const post = postID;
+        const user = userID;
+
         request(app)
-          .put(`/post/like/${ID}`)
+          .post(`/post/comment/${postID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ comment, post, user })
+          .then(() => {
+            cb(null, token, userID, postID);
+          });
+      },
+      function getCommentID(token, userID, postID, cb) {
+        request(app)
+          .get('/post')
+          .then((res) => {
+            const commentID = res.body[0].comments[0];
+            cb(null, token, postID, commentID);
+          });
+      },
+      function likeComment(token, postID, commentID) {
+        request(app)
+          .put(`/post/like/${postID}/${commentID}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(200, done);
-      },
-    ]);
-  });
-  test('users can like post once', (done) => {
-    async.waterfall([
-      function getToken(cb) {
-        request(app)
-          .post('/user/login')
-          .type('form')
-          .send({ username: 'spencer', password: '123' })
-          .then((res) => {
-            cb(null, res.body.token);
-          });
-      },
-      function getPostID(token, cb) {
-        request(app)
-          .get('/post')
-          .then((res) => {
-            const ID = res.body[0]._id;
-            cb(null, token, ID);
-          });
-      },
-      function likePost(token, ID, cb) {
-        request(app)
-          .put(`/post/like/${ID}`)
-          .set('Authorization', `Bearer ${token}`)
-          .then(() => {
-            cb(null, token, ID);
-          });
-      },
-      function likePostAgain(token, ID) {
-        request(app)
-          .put(`/post/like/${ID}`)
-          .set('Authorization', `Bearer ${token}`)
-          .expect(400, done);
-      },
-    ]);
-  });
-  test('users must be logged in', (done) => {
-    async.waterfall([
-      function getPostID(cb) {
-        request(app)
-          .get('/post')
-          .then((res) => {
-            const ID = res.body[0]._id;
-            cb(null, ID);
-          });
-      },
-      function likePost(ID) {
-        request(app).put(`/post/like/${ID}`).expect(401, done);
       },
     ]);
   });

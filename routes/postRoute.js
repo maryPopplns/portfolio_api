@@ -20,8 +20,9 @@ router.delete('/:postID', deletePost);
 
 router.put('/like/:postID', likePost);
 router.put('/unlike/:postID', unlikePost);
+router.put('/like/:postID/:commentID', likePostComment);
+
 router.post('/comment/:postID', commentPost);
 router.delete('/comment/:postID/:commentID', deletePostComment);
-router.put('/like/:postID/:commentID', likePostComment);
 
 module.exports = router;

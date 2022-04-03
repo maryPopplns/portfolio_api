@@ -8,6 +8,7 @@
     "playground": "node utils/dbplayground.js",
     "jwtsecret": "node utils/jwtSecret.js",
     "test": "jest --watch --coverage --detectOpenHandles",
+    "deploy": "git push heroku main",
     "git": "git add . && git commit && git push origin $(git rev-parse --abbrev-ref HEAD) && echo '\n' && echo $(tput setaf 2)'committed: ' $(tput setaf 1)$(date) && echo '\n'"
   },
   "dependencies": {

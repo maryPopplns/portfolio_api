@@ -16,8 +16,7 @@ exports.contact = [
     const errors = result.errors[0];
 
     // incorrect email format
-    errors && res.status(400).json(errors);
-    // errors && res.status(400).json({ message: 'incorrect email format' });
+    errors && res.status(400).json({ message: 'incorrect email format' });
     !errors && next();
   },
   function sendEmail(req, res, next) {

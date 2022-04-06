@@ -10,6 +10,7 @@ const Comment = require(path.join(__dirname, '../models/comment'));
 
 exports.getPosts = function (req, res, next) {
   Post.find()
+    .populate('comments')
     .lean()
     .then((posts) => res.json(posts))
     .catch((error) => next(error));

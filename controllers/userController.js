@@ -87,7 +87,11 @@ exports.loginUser = [
         process.env.JWT_SECRET
       );
       // send token/user
-      res.json({ user: req.user, token });
+      const isSuperUser = req.user.superUser === true;
+
+      isSuperUser &&
+        res.json({ key: process.env.TEXT_GEARS_API, user: req.user, token });
+      !isSuperUser && res.json({ user: req.user, token });
     });
   },
 ];

@@ -1,12 +1,14 @@
+require('dotenv').config();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const axios = require('axios').default;
 const { logger } = require(path.join(__dirname, '../config/logger'));
 const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));
 const Comment = require(path.join(__dirname, '../models/comment'));
 
-require(path.join(__dirname, '../config/mongodb'));
+// require(path.join(__dirname, '../config/mongodb'));
 const closeConnection = () => mongoose.connection.close();
 
 function createUser() {
@@ -59,3 +61,40 @@ function createComment() {
 // createUser();
 // createPost();
 // createComment();
+
+(function grammarRequest() {
+  const config = {
+    headers: {
+      Authorization: process.env.TEXT_GEARS_API,
+    },
+  };
+
+  axios(
+    'https://api.textgears.com/grammar?text=sdfasdfsafsaf+fasfasdf&language=en-US',
+    config
+  ).then(({ data }) => {
+    const returned = data.response.errors;
+    console.log(returned);
+  });
+})();
+
+(function SentimentRequest() {
+  const params = {
+    PrivateKey: process.env.TEXT_2_DATA_API,
+    DocumentText: 'the value of the text in the document',
+  };
+
+  const data = Object.keys(params)
+    .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+    .join('&');
+
+  const config = {
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data,
+  };
+
+  axios('http://api.text2data.com/v3/analyze', config).then(({ data }) => {
+    // const returned = data.response.errors;
+    console.log(data.Themes);
+  });
+})();

@@ -29,3 +29,14 @@ exports.grammar = [
       .catch((error) => next(error));
   },
 ];
+
+exports.sentiment = [
+  check('title').trim().escape(),
+  check('body').trim().escape(),
+  function (req, res, next) {
+    const title = req.body.title;
+    const body = req.body.body;
+
+    res.json({ title, body });
+  },
+];

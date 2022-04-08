@@ -64,21 +64,19 @@ function createComment() {
 
 (function grammarRequest() {
   const config = {
+    url: 'https://api.textgears.com/grammar?text=sdfasdfsafsaf+fasfasdf&language=en-US',
     headers: {
       Authorization: process.env.TEXT_GEARS_API,
     },
   };
 
-  axios(
-    'https://api.textgears.com/grammar?text=sdfasdfsafsaf+fasfasdf&language=en-US',
-    config
-  ).then(({ data }) => {
+  axios(config).then(({ data }) => {
     const returned = data.response.errors;
     console.log(returned);
   });
 })();
 
-(function SentimentRequest() {
+function sentimentRequest() {
   const params = {
     PrivateKey: process.env.TEXT_2_DATA_API,
     DocumentText: 'the value of the text in the document',
@@ -97,4 +95,4 @@ function createComment() {
     // const returned = data.response.errors;
     console.log(data.Themes);
   });
-})();
+}

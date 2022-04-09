@@ -8,7 +8,7 @@ const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));
 const Comment = require(path.join(__dirname, '../models/comment'));
 
-// require(path.join(__dirname, '../config/mongodb'));
+require(path.join(__dirname, '../config/mongodb'));
 const closeConnection = () => mongoose.connection.close();
 
 function createUser() {
@@ -58,41 +58,6 @@ function createComment() {
     });
 }
 
-// createUser();
+createUser();
 // createPost();
 // createComment();
-
-(function grammarRequest() {
-  const config = {
-    url: 'https://api.textgears.com/grammar?text=sdfasdfsafsaf+fasfasdf&language=en-US',
-    headers: {
-      Authorization: process.env.TEXT_GEARS_API,
-    },
-  };
-
-  axios(config).then(({ data }) => {
-    const returned = data.response.errors;
-    console.log(returned);
-  });
-})();
-
-function sentimentRequest() {
-  const params = {
-    PrivateKey: process.env.TEXT_2_DATA_API,
-    DocumentText: 'the value of the text in the document',
-  };
-
-  const data = Object.keys(params)
-    .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-    .join('&');
-
-  const config = {
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    data,
-  };
-
-  axios('http://api.text2data.com/v3/analyze', config).then(({ data }) => {
-    // const returned = data.response.errors;
-    console.log(data.Themes);
-  });
-}

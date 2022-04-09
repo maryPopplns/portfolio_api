@@ -7,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const miscRouter = require(path.join(__dirname, './routes/miscRoute'));
 const userRoute = require(path.join(__dirname, './routes/userRoute'));
 const postRoute = require(path.join(__dirname, './routes/postRoute'));
-const analysisRoute = require(path.join(__dirname, './routes/analysisRoute'));
 const auth = require(path.join(__dirname, './middleware/jwtAuth'));
 
 const app = express();
@@ -31,7 +30,6 @@ app.use(auth);
 app.use('/', miscRouter);
 app.use('/user', userRoute);
 app.use('/post', postRoute);
-app.use('/analysis', analysisRoute);
 
 // error handler
 app.use(function (error, req, res, next) {

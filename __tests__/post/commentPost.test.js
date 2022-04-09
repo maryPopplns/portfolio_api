@@ -33,7 +33,7 @@ describe('POST /post/comment/:postID', () => {
     }).catch((error) => logger.error(`${error}`));
   });
 
-  test('users can comment on posts', (done) => {
+  test.skip('users can comment on posts', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)
@@ -80,7 +80,7 @@ describe('POST /post/comment/:postID', () => {
       },
     ]);
   });
-  test('user must be authenticated', (done) => {
+  test.skip('user must be authenticated', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)

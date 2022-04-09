@@ -50,10 +50,8 @@ exports.contact = [
 exports.grammar = [
   isLoggedIn,
   isSuperUser,
-  check('title').trim().escape(),
   check('body').trim().escape(),
   function (req, res, next) {
-    const title = req.body.title;
     const body = req.body.body;
 
     const baseUrl = 'https://api.textgears.com/grammar?';

@@ -80,7 +80,7 @@ describe('PUT /post/like/:postID/:commentID', () => {
         request(app)
           .get('/post')
           .then((res) => {
-            const commentID = res.body[0].comments[0];
+            const commentID = res.body[0].comments[0]._id;
             cb(null, token, postID, commentID);
           });
       },
@@ -140,7 +140,7 @@ describe('PUT /post/like/:postID/:commentID', () => {
         request(app)
           .get('/post')
           .then((res) => {
-            const commentID = res.body[0].comments[0];
+            const commentID = res.body[0].comments[0]._id;
             cb(null, token, postID, commentID);
           });
       },

@@ -80,15 +80,13 @@ describe('DELETE /post/comment/:postID/:commentID', () => {
           .set('Authorization', `Bearer ${token}`)
           .type('form')
           .send({ comment, post, user })
-          .then(() => {
-            cb(null, token, userID, postID);
-          });
+          .then(() => cb(null, token, userID, postID));
       },
       function getCommentID(token, userID, postID, cb) {
         request(app)
           .get('/post')
           .then((res) => {
-            const commentID = res.body[0].comments[0];
+            const commentID = res.body[0].comments[0]._id;
             cb(null, token, userID, postID, commentID);
           });
       },

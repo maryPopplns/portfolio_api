@@ -32,33 +32,3 @@ exports.grammar = [
       .catch((error) => next(error));
   },
 ];
-
-exports.sentiment = [
-  isLoggedIn,
-  isSuperUser,
-  check('title').trim().escape(),
-  check('body').trim().escape(),
-  function (req, res, next) {
-    const title = req.body.title;
-    const body = req.body.body;
-
-    const params = {
-      PrivateKey: process.env.TEXT_2_DATA_API,
-      DocumentText: title + '.' + body,
-    };
-    const data = Object.keys(params)
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
-
-    const config = {
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      data,
-    };
-
-    axios('http://api.text2data.com/v3/analyze', config)
-      .then(({ data }) => {
-        res.json(data);
-      })
-      .catch((error) => next(error));
-  },
-];

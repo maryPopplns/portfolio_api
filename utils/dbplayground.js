@@ -2,7 +2,6 @@ require('dotenv').config();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
-const axios = require('axios').default;
 const { logger } = require(path.join(__dirname, '../config/logger'));
 const User = require(path.join(__dirname, '../models/user'));
 const Post = require(path.join(__dirname, '../models/post'));

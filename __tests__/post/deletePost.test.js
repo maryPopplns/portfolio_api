@@ -19,6 +19,7 @@ app.use('/user', userRoute);
 // user model
 const User = require(path.join(__dirname, '../../models/user'));
 const Post = require(path.join(__dirname, '../../models/post'));
+const Comment = require(path.join(__dirname, '../../models/comment'));
 
 describe('DELETE /post/:postID', () => {
   // objectID of post to edit
@@ -66,15 +67,10 @@ describe('DELETE /post/:postID', () => {
             next(null, res.body.token);
           });
       },
-      function editPost(token) {
-        const title = 'authorized';
-        const body = 'authorized';
-
+      function deletePost(token) {
         request(app)
           .delete(`/post/${objectID}`)
           .set('Authorization', `Bearer ${token}`)
-          .type('form')
-          .send({ title, body })
           .expect(200, done);
       },
     ]);
@@ -110,6 +106,45 @@ describe('DELETE /post/:postID', () => {
           .type('form')
           .send({ title, body })
           .expect(403, done);
+      },
+    ]);
+  });
+
+  test('comments on post are deleted', (done) => {
+    async.waterfall([
+      function getToken(cb) {
+        request(app)
+          .post('/user/login')
+          .type('form')
+          .send({ username: 'spencer', password: '123' })
+          .then((res) => {
+            const userID = res.body.user._id;
+            const token = res.body.token;
+            cb(null, token, userID);
+          });
+      },
+      function commentPost(token, userID, cb) {
+        const comment = 'comment for the post';
+        const user = userID;
+
+        request(app)
+          .post(`/post/comment/${objectID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .type('form')
+          .send({ comment, objectID, user })
+          .then(() => cb(null, token));
+      },
+      function deletePost(token, cb) {
+        request(app)
+          .delete(`/post/${objectID}`)
+          .set('Authorization', `Bearer ${token}`)
+          .then(() => cb());
+      },
+      function checkComment() {
+        Comment.find().then((result) => {
+          expect(result.length).toBe(0);
+          done();
+        });
       },
     ]);
   });

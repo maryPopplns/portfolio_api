@@ -61,16 +61,3 @@ function createComment() {
 // createUser();
 // createPost();
 // createComment();
-
-(function deleteMany() {
-  async
-    .parallel([
-      function deletePost(cb) {
-        Post.findByIdAndDelete().then(cb);
-      },
-      function deleteComments(cb) {
-        Comment.deleteMany({ id: req.comments }).then(cb);
-      },
-    ])
-    .then(() => console.log('deleted'));
-})();

@@ -14,7 +14,7 @@ exports.getPosts = function (req, res, next) {
     .populate('comments')
     .lean()
     .then((posts) => res.json(posts))
-    .catch((error) => next(error));
+    .catch(next);
 };
 
 exports.createPost = [
@@ -28,7 +28,7 @@ exports.createPost = [
       body: req.body.body,
     })
       .then(() => res.status(201).json({ message: 'post created' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -44,19 +44,42 @@ exports.editPost = [
 
     Post.findByIdAndUpdate(postID, updatedPost)
       .then(() => res.json({ message: 'post has been updated' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
 exports.deletePost = [
   isLoggedIn,
   isSuperUser,
-  function editPost(req, res, next) {
-    const postID = req.params.postID;
-
-    Post.findByIdAndDelete(postID)
+  function getCommentIds(req, res, next) {
+    Post.findById(req.params.postID)
+      .then((result) => {
+        req.comments = result.comments;
+        next();
+      })
+      .catch(next);
+  },
+  function removePostAndComments(req, res, next) {
+    async
+      .parallel([
+        function deletePost(cb) {
+          const postID = req.params.postID;
+          Post.findByIdAndDelete(postID)
+            .then(() => cb())
+            .catch(next);
+        },
+        function deleteComments(cb) {
+          Comment.deleteMany({
+            _id: {
+              $in: req.comments,
+            },
+          })
+            .then(() => cb())
+            .catch(next);
+        },
+      ])
       .then(() => res.json({ message: 'post has been deleted' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -86,7 +109,7 @@ exports.likePost = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
         function updateUser(done) {
           // add postID to user like list
@@ -96,11 +119,11 @@ exports.likePost = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
       ])
       .then(() => res.json({ message: 'Post has been liked' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -130,7 +153,7 @@ exports.unlikePost = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => next(error));
+            .catch(next);
         },
         function pullPost(done) {
           // remove postID from likedPosts
@@ -140,46 +163,44 @@ exports.unlikePost = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => next(error));
+            .catch(next);
         },
       ])
       .then(() => res.json({ message: 'Post has been unliked' }))
-      .catch((error) => {
-        next(error);
-      });
+      .catch(next);
   },
 ];
 
 exports.commentPost = [
   isLoggedIn,
   check('comment').trim().escape(),
-  function sentimentAnalysis(req, res, next) {
-    const params = {
-      PrivateKey: process.env.TEXT_2_DATA_API,
-      DocumentText: req.body.comment,
-    };
+  // function sentimentAnalysis(req, res, next) {
+  //   const params = {
+  //     PrivateKey: process.env.TEXT_2_DATA_API,
+  //     DocumentText: req.body.comment,
+  //   };
 
-    const data = Object.keys(params)
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
+  //   const data = Object.keys(params)
+  //     .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+  //     .join('&');
 
-    const config = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    };
+  //   const config = {
+  //     headers: {
+  //       'Content-Type': 'application/x-www-form-urlencoded',
+  //     },
+  //   };
 
-    axios
-      .post('http://api.text2data.com/v3/analyze', data, config)
-      .then(({ data }) => {
-        req.data = data;
-        const sentiment = data.DocSentimentResultString;
-        // lie if the post is negative
-        sentiment === 'negative' &&
-          res.status(201).json({ message: 'comment added to post' });
-        sentiment !== 'negative' && next();
-      });
-  },
+  //   axios
+  //     .post('http://api.text2data.com/v3/analyze', data, config)
+  //     .then(({ data }) => {
+  //       req.data = data;
+  //       const sentiment = data.DocSentimentResultString;
+  //       // lie if the post is negative
+  //       sentiment === 'negative' &&
+  //         res.status(201).json({ message: 'comment added to post' });
+  //       sentiment !== 'negative' && next();
+  //     });
+  // },
   function createComment(req, res, next) {
     const userID = req.user.id;
     const postID = req.params.postID;
@@ -194,7 +215,7 @@ exports.commentPost = [
         req.commentID = result.id;
         next();
       })
-      .catch((error) => next(error));
+      .catch(next);
   },
   function (req, res, next) {
     const userID = req.user.id;
@@ -210,7 +231,7 @@ exports.commentPost = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
         function updatePost(done) {
           Post.findByIdAndUpdate(
@@ -221,7 +242,7 @@ exports.commentPost = [
             .then(() => {
               done(null);
             })
-            .catch((error) => done(error));
+            .catch(next);
         },
       ])
       .then(() => {
@@ -229,7 +250,7 @@ exports.commentPost = [
         res.status(201).json({ message: 'comment added to post' });
         next();
       })
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -246,7 +267,7 @@ exports.deletePostComment = [
         function deleteComment(done) {
           Comment.findByIdAndDelete(commentID)
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
         function updateUser(done) {
           User.findByIdAndUpdate(
@@ -255,7 +276,7 @@ exports.deletePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => next(error));
+            .catch(next);
         },
         function updatePost(done) {
           Post.findByIdAndUpdate(
@@ -264,11 +285,11 @@ exports.deletePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => next(error));
+            .catch(next);
         },
       ])
       .then(() => res.json({ message: 'comment has been deleted' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -298,7 +319,7 @@ exports.likePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
         function updateUser(done) {
           // add commentID to user likedComments list
@@ -308,11 +329,11 @@ exports.likePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
       ])
       .then(() => res.json({ message: 'Comment has been liked' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 
@@ -342,7 +363,7 @@ exports.unlikePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
         function updateUser(done) {
           // remove commentID from likedPosts
@@ -352,10 +373,10 @@ exports.unlikePostComment = [
             { upsert: true, new: true }
           )
             .then(() => done(null))
-            .catch((error) => done(error));
+            .catch(next);
         },
       ])
       .then(() => res.json({ message: 'Comment has been unliked' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];

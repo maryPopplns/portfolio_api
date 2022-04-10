@@ -21,7 +21,7 @@ exports.createUser = [
           ? res.status(409).json({ message: 'same name exists' })
           : next();
       })
-      .catch((error) => next(error));
+      .catch(next);
   },
   // create user
   async function createUser(req, res, next) {
@@ -32,13 +32,13 @@ exports.createUser = [
     await bcrypt
       .genSalt(10)
       .then((result) => (salt = result))
-      .catch((error) => next(error));
+      .catch(next);
 
     // create hashed password
     await bcrypt
       .hash(req.body.password, salt)
       .then((result) => (hashedPassword = result))
-      .catch((error) => next(error));
+      .catch(next);
 
     // create/save user
     await User.create({
@@ -46,7 +46,7 @@ exports.createUser = [
       password: hashedPassword,
     })
       .then(() => res.status(201).json({ message: 'user created' }))
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];
 

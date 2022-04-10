@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const async = require('async');
 const mongoose = require('mongoose');
 const { logger } = require(path.join(__dirname, '../config/logger'));
 const User = require(path.join(__dirname, '../models/user'));
@@ -57,6 +58,19 @@ function createComment() {
     });
 }
 
-createUser();
+// createUser();
 // createPost();
 // createComment();
+
+(function deleteMany() {
+  async
+    .parallel([
+      function deletePost(cb) {
+        Post.findByIdAndDelete().then(cb);
+      },
+      function deleteComments(cb) {
+        Comment.deleteMany({ id: req.comments }).then(cb);
+      },
+    ])
+    .then(() => console.log('deleted'));
+})();

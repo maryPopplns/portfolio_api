@@ -69,6 +69,6 @@ exports.grammar = [
       .then(({ data }) => {
         res.json(data.response);
       })
-      .catch((error) => next(error));
+      .catch(next);
   },
 ];

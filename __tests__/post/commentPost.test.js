@@ -11,7 +11,7 @@ require(path.join(__dirname, '../../config/passport'));
 const auth = require(path.join(__dirname, '../../middleware/jwtAuth.js'));
 app.use(auth);
 // routes
-const postRoute = require(path.join(__dirname, '../../routes/postRoute'));
+const postRoute = require(path.join(__dirname, '../__mocks__/postRoute'));
 const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 app.use('/post', postRoute);
 app.use('/user', userRoute);
@@ -33,7 +33,7 @@ describe('POST /post/comment/:postID', () => {
     }).catch((error) => logger.error(`${error}`));
   });
 
-  test.skip('users can comment on posts', (done) => {
+  test('users can comment on posts', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)
@@ -80,7 +80,7 @@ describe('POST /post/comment/:postID', () => {
       },
     ]);
   });
-  test.skip('user must be authenticated', (done) => {
+  test('user must be authenticated', (done) => {
     async.waterfall([
       function getToken(cb) {
         request(app)

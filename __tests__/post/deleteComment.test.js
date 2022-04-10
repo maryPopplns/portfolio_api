@@ -11,7 +11,7 @@ require(path.join(__dirname, '../../config/passport'));
 const auth = require(path.join(__dirname, '../../middleware/jwtAuth.js'));
 app.use(auth);
 // routes
-const postRoute = require(path.join(__dirname, '../../routes/postRoute'));
+const postRoute = require(path.join(__dirname, '../__mocks__/postRoute'));
 const userRoute = require(path.join(__dirname, '../../routes/userRoute'));
 app.use('/post', postRoute);
 app.use('/user', userRoute);

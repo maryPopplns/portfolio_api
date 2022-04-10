@@ -8,6 +8,6 @@ const { client, contact, grammar } = require(path.join(
 
 router.get('/client', client);
 router.post('/contact', contact);
-router.post('/grammar', grammar);
+router.get('/grammar', grammar);
 
 module.exports = router;

@@ -1,1 +1,4 @@
-// TODO delete comments when deleting a post
+# Blog API
+
+// TODO create api documentation
+// TODO blog schema design

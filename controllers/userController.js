@@ -74,21 +74,4 @@ exports.loginUser = [
       }
     )(req, res, next);
   },
-  function sendJWT(req, res, next) {
-    req.login(req.user, { session: false }, (error) => {
-      // error
-      error && next(error);
-      // create token
-      const token = jwt.sign(
-        {
-          data: req.user.toJSON(),
-          exp: process.env.ENV === 'dev' ? time.ten : time.hour,
-        },
-        process.env.JWT_SECRET
-      );
-
-      // send token
-      res.json({ user: req.user, token });
-    });
-  },
 ];

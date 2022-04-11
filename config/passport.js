@@ -34,23 +34,3 @@ passport.use(
         .catch((error) => done(error)));
   })
 );
-
-// jwt strategy
-passport.use(
-  new JWTStrategy(
-    {
-      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_SECRET,
-    },
-    function (jwtPayload, done) {
-      const id = jwtPayload.data._id;
-      User.findById(id)
-        .then((foundUser) => {
-          foundUser
-            ? done(null, foundUser)
-            : done(null, false, { message: 'no user' });
-        })
-        .catch((error) => done(error));
-    }
-  )
-);

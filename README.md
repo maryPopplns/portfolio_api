@@ -2,4 +2,5 @@
 
 // TODO create api documentation
 // TODO blog schema design
-// readme
+
+// get grammar suggestions, not just spelling

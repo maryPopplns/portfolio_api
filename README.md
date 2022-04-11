@@ -2,3 +2,4 @@
 
 // TODO create api documentation
 // TODO blog schema design
+// readme

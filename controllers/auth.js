@@ -1,6 +1,7 @@
 exports.isLoggedIn = function (req, res, next) {
   req.user && next();
-  !req.user && res.status(401).json({ messsage: 'unauthorized' });
+  !req.user &&
+    res.status(401).json({ user: req.user, messsage: 'unauthorized' });
 };
 
 exports.isSuperUser = function (req, res, next) {

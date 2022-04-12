@@ -50,11 +50,6 @@ exports.createUser = [
   },
 ];
 
-const time = {
-  hour: Math.floor(Date.now() / 1000) + 360,
-  ten: Math.floor(Date.now() / 1000) + 360 * 240,
-};
-
 // login user
 exports.loginUser = [
   check('username').trim().escape(),
